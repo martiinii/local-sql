@@ -1,0 +1,19 @@
+{
+  "name": "@local-sql/utils",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "format": "biome format --write .",
+    "lint": "biome lint"
+  },
+  "devDependencies": {
+    "@local-sql/typescript-config": "workspace:*"
+  },
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1"
+  }
+}

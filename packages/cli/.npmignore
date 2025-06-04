@@ -1,0 +1,7 @@
+.turbo
+node_modules
+.gitignore
+.gitkeep
+*.ts
+!/bin/app//build/**
+!/bin/api/build/**

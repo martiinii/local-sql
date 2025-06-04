@@ -1,0 +1,29 @@
+{
+  "name": "@local-sql/api",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build --target node --minify-whitespace --minify-syntax --outdir ../../packages/cli/bin/api/build ./src/index.ts",
+    "start": "bun src/index.ts",
+    "format": "biome format --write .",
+    "lint": "biome lint"
+  },
+  "dependencies": {
+    "@elysiajs/node": "^1.3.0",
+    "@elysiajs/swagger": "^1.3.0",
+    "@local-sql/db-types": "workspace:*",
+    "@local-sql/utils": "workspace:*",
+    "@sinclair/typebox": "^0.34.33",
+    "chalk": "^5.4.1",
+    "elysia": "^1.3.1",
+    "pg": "^8.16.0"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.2"
+  }
+}

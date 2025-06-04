@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Local SQL (WIP)
 
-## Getting Started
+Local SQL is a web based, local-first modern database browser.
+Visit [localsql.dev](https://localsql.dev), add connection and start browsing your tables.
 
-First, run the development server:
+> [!IMPORTANT]
+> This project is under heavy development, check TODO section for current progress. Some things can be broken, some are missing
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+- **Privacy-Focused** Your database connection details are stored exclusively in your browser's local storage. No sensitive data is ever transmitted to or shared with any external services - only your locally running server.
+- **Local Server** A simple command-line tool initiates a local web server, enabling secure communication between your browser and databases. This ensures all database operations are performed locally on your machine.
+
+## TODO
+- [x] Implement data fetching and data viewer
+- [ ] Inserting and updating data
+- [ ] Manage existing connections
+- [ ] Implement pagination
+- [ ] Explore different way to save connections (in browser local-storage vs server db with os app data directory)
+
+## Get started
+Try out Local SQL [online dashboard](https://localsql.dev) or run app locally:
+```sh
+# Bun.js
+bunx --bun local-sql@latest
+
+# pnpm
+pnpm dlx local-sql@latest
+
+# Node.js
+npx local-sql@latest
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

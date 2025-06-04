@@ -1,0 +1,16 @@
+{
+  "name": "@local-sql/db-types",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "format": "biome format --write .",
+    "lint": "biome lint"
+  },
+  "devDependencies": {
+    "@local-sql/typescript-config": "workspace:*"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}
