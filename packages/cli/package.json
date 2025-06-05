@@ -1,7 +1,7 @@
 {
   "name": "local-sql",
   "description": "Manage PostgreSQL databases locally",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "bin": {
     "local-sql": "./bin/local-sql.js",
