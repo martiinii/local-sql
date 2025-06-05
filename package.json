@@ -1,8 +1,11 @@
 {
   "name": "@local-sql/core",
-  "version": "0.0.1",
+  "version": "--help",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "build": "turbo build",
     "clean": "git clean -xdf node_modules",
@@ -11,7 +14,8 @@
     "format": "biome format --write .",
     "lint": "turbo lint && bun lint:repo",
     "lint:repo": "bunx sherif@latest",
-    "lint:repo:fix": "bunx sherif@latest --fix"
+    "lint:repo:fix": "bunx sherif@latest --fix",
+    "bump": "bumpp"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
@@ -19,5 +23,9 @@
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },
-  "packageManager": "bun@1.2.15"
+  "packageManager": "bun@1.2.15",
+  "dependencies": {
+    "bumpp": "^10.1.1",
+    "tinyglobby": "^0.2.14"
+  }
 }
