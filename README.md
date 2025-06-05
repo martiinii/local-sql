@@ -1,4 +1,6 @@
-# Local SQL (WIP)
+![Local SQL](assets/github.svg)
+
+---
 
 Local SQL is a web based, local-first modern database browser.
 Visit [localsql.dev](https://localsql.dev), add connection and start browsing your tables.
