@@ -1,11 +1,8 @@
 {
   "name": "@local-sql/core",
-  "version": "--help",
+  "version": "1.0.2",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "build": "turbo build",
     "clean": "git clean -xdf node_modules",
