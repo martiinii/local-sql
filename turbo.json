@@ -37,7 +37,8 @@
       "cache": false
     },
     "lint": {
-      "dependsOn": ["^topo"]
+      "dependsOn": ["^topo"],
+      "cache": false
     },
     "typecheck": {
       "dependsOn": ["^topo"],
