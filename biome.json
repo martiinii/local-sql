@@ -7,7 +7,13 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["node_modules", ".next", "bin/standalone", "bin/local-sql.js"]
+    "ignore": [
+      "node_modules",
+      ".next",
+      "api/build",
+      "app/build",
+      "bin/local-sql.js"
+    ]
   },
   "formatter": {
     "enabled": true,
