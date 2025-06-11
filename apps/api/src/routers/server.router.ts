@@ -143,7 +143,7 @@ export const serverRouter = new Elysia({
       return res;
     },
   )
-  // Other servers (local server is used as proxy)
+  // Other servers (local server is used as gateway)
   .post(
     "/:serverId/database/:databaseId/connect",
     async ({ params, store: { servers }, status }) => {
@@ -160,7 +160,7 @@ export const serverRouter = new Elysia({
       }
 
       try {
-        const response = await server.proxyApi.server.local
+        const response = await server.gatewayApi.server.local
           .database({ databaseId: params.databaseId })
           .connect.post();
         if (response.error) {
@@ -190,7 +190,7 @@ export const serverRouter = new Elysia({
       }
 
       try {
-        const response = await server.proxyApi.server.local
+        const response = await server.gatewayApi.server.local
           .database({ databaseId: params.databaseId })
           .disconnect.post();
         if (response.error) {
@@ -223,7 +223,7 @@ export const serverRouter = new Elysia({
       }
 
       try {
-        const response = await server.proxyApi.server.local
+        const response = await server.gatewayApi.server.local
           .database({ databaseId: params.databaseId })
           .tables.get();
         if (response.error) {
@@ -256,7 +256,7 @@ export const serverRouter = new Elysia({
       }
 
       try {
-        const response = await server.proxyApi.server.local
+        const response = await server.gatewayApi.server.local
           .database({ databaseId: params.databaseId })
           .data({ table: params.table })
           .get();

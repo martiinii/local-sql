@@ -4,7 +4,7 @@ import {
 } from "@local-sql/db-types";
 import { LOCAL_SERVER_URL } from "../constants";
 import { db } from "../db";
-import { type ProxyApi, getProxyApi } from "../lib/eden";
+import { type GatewayApi, getGatewayApi } from "../lib/eden";
 import { Connections } from "./connections";
 
 type ServerConstructor = {
@@ -21,7 +21,7 @@ export class Server {
   private _token: string | null = null;
   private _connections: Connections;
 
-  proxyApi: ProxyApi;
+  gatewayApi: GatewayApi;
 
   constructor({ name, url, token }: ServerConstructor) {
     this.name = name;
@@ -29,7 +29,7 @@ export class Server {
     this._token = token || null;
     this._connections = new Connections();
 
-    this.proxyApi = getProxyApi(this._url, this._token);
+    this.gatewayApi = getGatewayApi(this._url, this._token);
   }
 
   get isConnected() {
@@ -68,7 +68,7 @@ export class Server {
       }
 
       // We are connecting to remote API instance
-      const response = await this.proxyApi
+      const response = await this.gatewayApi
         .server({ serverId: LOCAL_SERVER_ID })
         .get();
 
