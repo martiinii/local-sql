@@ -10,16 +10,18 @@ Visit [localsql.dev](https://localsql.dev), add connection and start browsing yo
 
 ## Features
 
-- **Privacy-Focused** Your database connection details are stored exclusively in your browser's local storage. No sensitive data is ever transmitted to or shared with any external services - only your locally running server.
+- **Privacy-Focused** Your database connection details are stored exclusively in sql database on your computer. No sensitive data is ever transmitted to or shared with any external services - only your locally running server.
 - **Local Server** A simple command-line tool initiates a local web server, enabling secure communication between your browser and databases. This ensures all database operations are performed locally on your machine.
+- **Secure Gateway**: Connect multiple `local-sql` instances together to manage all your databases from a single interface. This is perfect for accessing databases in isolated environments without exposing them publicly.
 
 ## TODO
 
 - [x] Implement data fetching and data viewer
 - [ ] Inserting and updating data
-- [ ] Manage existing connections
+- [ ] Manage existing servers & connections
 - [ ] Implement pagination
-- [ ] Explore different way to save connections (in browser local-storage vs server db with os app data directory)
+- [x] Explore different way to save connections (in browser local-storage vs server db with os app data directory)
+- [ ] Server key generation (for gateways), permissions
 
 ## Get started
 
@@ -44,6 +46,7 @@ npx local-sql@latest
 - [Tailwind](https://tailwindcss.com/)
 - [Zustand](https://github.com/pmndrs/zustand)
 - [Turborepo](https://turborepo.com/)
+- [drizzle-orm](https://orm.drizzle.team/)
 - [Bun](https://bun.sh/)
 - [TypeScript](https://www.typescriptlang.org/)
 
