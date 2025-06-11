@@ -1,26 +1,35 @@
 import type {
+  DBAddResponse,
   DBConnectionResponse,
   DBValidConnectionStatus,
 } from "@local-sql/db-types";
-import Elysia from "elysia";
-import { createDatabaseConnection } from "../db";
-import type { DatabaseConnection } from "../db/database-connection";
+import { createDatabaseConnection } from "./create-database-connection";
+import type { DatabaseConnection } from "./database-connection";
 
-class DatabaseConnections {
-  private _connectionNames: Set<string> = new Set();
+export class Connections {
+  private _connectionIds: Set<string> = new Set();
   private _connections: Map<string, DatabaseConnection> = new Map();
 
+  private _serverUrl: string | null;
+  private _serverToken: string | null;
+
+  constructor(serverUrl?: string, serverToken?: string) {
+    this._serverUrl = serverUrl || null;
+    this._serverToken = serverToken || null;
+  }
   /**
    * Internal function to add database connection and query tables
-   * @param name database slug
+   * @param id Database id
+   * @param name Database name
    * @param uri Database connection
    * @returns Database connection response
    */
   private async addDatabase(
+    id: string,
     name: string,
     uri: string,
-  ): Promise<DBConnectionResponse> {
-    const connection = this._connections.get(name);
+  ): Promise<DBAddResponse> {
+    const connection = this._connections.get(id);
     if (connection) {
       const isConnected = connection.isConnected;
       const status: DBValidConnectionStatus = isConnected
@@ -38,10 +47,10 @@ class DatabaseConnections {
     }
 
     try {
-      const dbConnection = createDatabaseConnection(uri);
+      const dbConnection = createDatabaseConnection(name, uri);
 
-      this._connectionNames.add(name);
-      this._connections.set(name, dbConnection);
+      this._connectionIds.add(id);
+      this._connections.set(id, dbConnection);
 
       return {
         connectionStatus: {
@@ -64,16 +73,17 @@ class DatabaseConnections {
 
   /**
    * Function to add multiple databases at once
-   * @param connections Array of database connections (slug + uri)
+   * @param connections Array of database connections (id, name and uri)
    * @returns Databases connection response
    */
   async add(
-    connections: { name: string; uri: string }[],
-  ): Promise<DBConnectionResponse[]> {
-    const res: DBConnectionResponse[] = [];
+    connections: { id: string; name: string; uri: string }[],
+  ): Promise<DBAddResponse[]> {
+    const res: DBAddResponse[] = [];
 
     for (const connection of connections) {
       const connectionState = await this.addDatabase(
+        connection.id,
         connection.name,
         connection.uri,
       );
@@ -87,34 +97,28 @@ class DatabaseConnections {
     return this._connections.get(name) || null;
   }
 
-  get connectionNames(): string[] {
-    return Array.from(this._connectionNames);
+  get list(): DBConnectionResponse[] {
+    const connections = Array.from(this._connections);
+    return connections.map(([id, conn]) => ({
+      id,
+      name: conn.name,
+      isConnected: conn.isConnected,
+      tables: conn.tablesWithSchema,
+    }));
   }
 
-  async remove(name: string): Promise<void> {
-    const connection = this.get(name);
-    if (!connection) {
-      return;
-    }
-
-    await connection.disconnect();
-
-    this._connectionNames.delete(name);
-    this._connections.delete(name);
+  async disconnect(id: string) {
+    const connection = this._connections.get(id);
+    await connection?.disconnect();
   }
 
-  async end() {
-    const removalPromises: Promise<void>[] = [];
+  async disconnectAll() {
+    const disconnectPromises: Promise<boolean>[] = [];
 
-    for (const name of Array.from(this._connectionNames)) {
-      removalPromises.push(this.remove(name));
+    for (const [, connection] of this._connections) {
+      disconnectPromises.push(connection.disconnect());
     }
 
-    await Promise.all(removalPromises);
+    await Promise.all(disconnectPromises);
   }
 }
-
-export const connectionsStore = new Elysia({ name: "connections-store" }).state(
-  "databases",
-  new DatabaseConnections(),
-);

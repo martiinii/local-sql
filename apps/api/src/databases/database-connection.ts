@@ -1,12 +1,14 @@
 import type { TableSchema, TableWithSchema } from "@local-sql/db-types";
 
 export abstract class DatabaseConnection {
+  name: string;
   private _isConnected = false;
   protected _uri: string;
   protected _tableNames: Set<string> | null = null;
   protected _tables: Map<string, TableSchema> = new Map();
 
-  constructor(uri: string) {
+  constructor(name: string, uri: string) {
+    this.name = name;
     this._uri = uri;
   }
 
@@ -25,8 +27,16 @@ export abstract class DatabaseConnection {
    * Establish connection to database
    * @returns True if connected, false if an error occured
    */
-  async connect(): Promise<boolean> {
-    if (this._isConnected) return true;
+  async connect(): Promise<{
+    isConnected: boolean;
+    tables: TableWithSchema[];
+  }> {
+    if (this._isConnected) {
+      return {
+        isConnected: true,
+        tables: (await this.queryTables()) || [],
+      };
+    }
 
     try {
       const connectionState = await this._connect();
@@ -35,7 +45,10 @@ export abstract class DatabaseConnection {
       this._isConnected = false;
     }
 
-    return this._isConnected;
+    return {
+      isConnected: this._isConnected,
+      tables: (await this.queryTables()) || [],
+    };
   }
 
   /**

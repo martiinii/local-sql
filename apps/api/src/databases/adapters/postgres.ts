@@ -5,8 +5,8 @@ import { DatabaseConnection } from "../database-connection";
 export class PostgresDatabaseConnection extends DatabaseConnection {
   private _db: Pool;
 
-  constructor(uri: string) {
-    super(uri);
+  constructor(name: string, uri: string) {
+    super(name, uri);
 
     this._db = new Pool({
       connectionString: uri,
