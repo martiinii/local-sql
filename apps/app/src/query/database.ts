@@ -4,25 +4,19 @@ import { unwrapEdenQuery } from "@/lib/eden-query";
 import { useAppStore } from "@/store/app.store";
 import {
   transformDatabaseConnectionResponse,
-  useConnectionStore,
-} from "@/store/connections.store";
+  useServersStore,
+} from "@/store/servers.store";
 
 export const useInitialize = (hideToastError?: boolean) => {
-  const storeInitialize = useConnectionStore((state) => state.initialize);
-  const storeConnections = useConnectionStore((state) => state.connections);
+  const storeInitialize = useServersStore((state) => state.initialize);
+
   const storeUpdateAppConnection = useAppStore((state) => state.setIsConnected);
   const storeIncrementAttemptsCount = useAppStore(
     (state) => state.incrementConnectionAttempts,
   );
 
   return useCreateMutation({
-    mutationFn: () =>
-      unwrapEdenQuery(api.init.post)({
-        databases: storeConnections.map((conn) => ({
-          name: conn.slug,
-          uri: conn.uri,
-        })),
-      }),
+    mutationFn: () => unwrapEdenQuery(api.init.post)(),
     onSuccess: (data) => {
       storeInitialize(data);
       storeUpdateAppConnection(true);
@@ -35,32 +29,34 @@ export const useInitialize = (hideToastError?: boolean) => {
 };
 
 export const useConnectDatabase = () => {
-  const storeUpdateConnection = useConnectionStore(
-    (state) => state.updateConnectionDetails,
+  const storeUpdateConnection = useServersStore(
+    (state) => state.updateDatabaseData,
   );
 
   return useCreateMutation({
-    mutationFn: async (slug: string) => {
-      const { connectionStatus } = await unwrapEdenQuery(
-        api.db({ slug }).connect.post,
+    mutationFn: async ({
+      serverId,
+      databaseId,
+    }: { serverId: string; databaseId: string }) => {
+      const { isConnected, tables } = await unwrapEdenQuery(
+        api.server({ serverId }).database({ databaseId }).connect.post,
       )();
-      const tables = await unwrapEdenQuery(api.db({ slug }).tables.get)();
-      return { connectionStatus, tables };
+      return { connectionStatus: isConnected, tables };
     },
-    onSuccess: (data, slug) => {
+    onSuccess: (data, { serverId, databaseId }) => {
       const transformedTables = transformDatabaseConnectionResponse(
         data.tables,
       );
 
-      storeUpdateConnection(slug, {
+      storeUpdateConnection(serverId, databaseId, {
         ...transformedTables,
         connectionStatus: {
           value: data.connectionStatus ? "connected" : "disconnected",
         },
       });
     },
-    onError: (error, slug) => {
-      storeUpdateConnection(slug, {
+    onError: (error, { serverId, databaseId }) => {
+      storeUpdateConnection(serverId, databaseId, {
         connectionStatus: {
           value: "error",
           error: error.message,

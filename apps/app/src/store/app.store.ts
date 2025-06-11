@@ -1,9 +1,11 @@
 "use client";
+
 import { revalidateTable } from "@/query/table";
 import { create } from "zustand";
 
 type AppView = {
-  database: string;
+  serverId: string;
+  databaseId: string;
   table: string;
 };
 interface AppStoreState {
@@ -13,7 +15,7 @@ interface AppStoreState {
 
   setIsConnected: (value: boolean) => void;
   incrementConnectionAttempts: () => void;
-  setView: (dbSlug: string, table: string) => void;
+  setView: (serverId: string, databaseId: string, table: string) => void;
 }
 
 export const useAppStore = create<AppStoreState>()((set) => ({
@@ -24,8 +26,8 @@ export const useAppStore = create<AppStoreState>()((set) => ({
   setIsConnected: (value) => set({ isConnected: value }),
   incrementConnectionAttempts: () =>
     set((state) => ({ connectionAttempts: state.connectionAttempts + 1 })),
-  setView: (dbSlug, table) => {
-    revalidateTable(dbSlug, table);
-    set({ view: { database: dbSlug, table } });
+  setView: (serverId, databaseId, table) => {
+    revalidateTable(serverId, databaseId, table);
+    set({ view: { serverId, databaseId, table } });
   },
 }));

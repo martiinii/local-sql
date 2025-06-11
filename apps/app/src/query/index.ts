@@ -1,5 +1,6 @@
 import type { UseSuspenseQueryResult } from "@tanstack/react-query";
 import * as databaseQuery from "./database";
+import * as tableQuery from "./table";
 
 export type InferQueryApiType<T> = T extends (...args: never) => unknown
   ? ReturnType<T> extends UseSuspenseQueryResult<infer R>
@@ -11,4 +12,5 @@ export type InferQueryApiType<T> = T extends (...args: never) => unknown
 
 export const query = {
   database: databaseQuery,
+  table: tableQuery,
 };

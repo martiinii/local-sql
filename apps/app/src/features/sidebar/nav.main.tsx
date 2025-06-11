@@ -2,7 +2,11 @@
 
 import { query } from "@/query";
 import { useAppStore } from "@/store/app.store";
-import { type Connection, useConnectionStore } from "@/store/connections.store";
+import {
+  type Connection,
+  type Server,
+  useServersStore,
+} from "@/store/servers.store";
 import {
   Collapsible,
   CollapsibleContent,
@@ -10,6 +14,9 @@ import {
 } from "@local-sql/ui/components/collapsible";
 import { Icons } from "@local-sql/ui/components/icons";
 import {
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -22,29 +29,55 @@ import type React from "react";
 import { ConnectionStatus } from "../connection/connection-status";
 
 export function NavMain() {
-  const connections = useConnectionStore((state) => state.connections);
+  const servers = useServersStore((state) => state.servers);
 
   return (
-    <SidebarMenu>
-      {connections.map((conn) => (
-        <DatabaseMenuItem key={conn.slug} connection={conn} />
+    <SidebarContent>
+      {servers.map((server) => (
+        <ServerSidebarGroup key={server.id} server={server} />
       ))}
-    </SidebarMenu>
+    </SidebarContent>
   );
 }
 
+type ServerSidebarGroupProps = {
+  server: Server;
+};
+export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
+  return (
+    <SidebarGroup>
+      <SidebarGroupLabel>{server.name}</SidebarGroupLabel>
+      <SidebarMenu>
+        {server.connections.map((conn) => (
+          <DatabaseMenuItem
+            key={conn.id}
+            serverId={server.id}
+            connection={conn}
+          />
+        ))}
+      </SidebarMenu>
+    </SidebarGroup>
+  );
+};
+
 type DatabaseMenuItemProps = {
+  serverId: string;
   connection: Connection;
 };
-const DatabaseMenuItem = ({ connection }: DatabaseMenuItemProps) => {
+const DatabaseMenuItem = ({ serverId, connection }: DatabaseMenuItemProps) => {
   if (connection.connectionStatus.value === "connected") {
-    return <ConnectedDatabaseMenuItem connection={connection} />;
+    return (
+      <ConnectedDatabaseMenuItem serverId={serverId} connection={connection} />
+    );
   }
 
-  return <DisconnectedDatabaseMenuItem connection={connection} />;
+  return (
+    <DisconnectedDatabaseMenuItem serverId={serverId} connection={connection} />
+  );
 };
 
 const DisconnectedDatabaseMenuItem = ({
+  serverId,
   connection,
 }: DatabaseMenuItemProps) => {
   const { mutate: connect, isPending } = query.database.useConnectDatabase();
@@ -52,7 +85,7 @@ const DisconnectedDatabaseMenuItem = ({
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
-        onClick={() => connect(connection.slug)}
+        onClick={() => connect({ serverId, databaseId: connection.id })}
         disabled={isPending}
       >
         <ConnectionStatus connectionStatus={connection.connectionStatus} />
@@ -63,19 +96,25 @@ const DisconnectedDatabaseMenuItem = ({
   );
 };
 
-const ConnectedDatabaseMenuItem = ({ connection }: DatabaseMenuItemProps) => {
+const ConnectedDatabaseMenuItem = ({
+  serverId,
+  connection,
+}: DatabaseMenuItemProps) => {
   const appView = useAppStore((state) => state.view);
   const changeAppView = useAppStore((state) => state.setView);
 
+  const isActive =
+    appView?.serverId === serverId && appView.databaseId === connection.id;
+
   return (
     <Collapsible
-      key={connection.slug}
+      key={connection.id}
       asChild
       defaultOpen={connection.connectionStatus.value === "connected"}
     >
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
-          <SidebarMenuButton isActive={appView?.database === connection.slug}>
+          <SidebarMenuButton isActive={isActive}>
             <ConnectionStatus connectionStatus={connection.connectionStatus} />
             <span className="truncate">{connection.name}</span>
             <Icons.ChevronRight className="ml-auto transition-transform group-data-[state=open]/menu-item:rotate-90" />
@@ -86,10 +125,8 @@ const ConnectedDatabaseMenuItem = ({ connection }: DatabaseMenuItemProps) => {
             <ConnectedDatabaseTableButton
               key={table}
               table={table}
-              onClick={() => changeAppView(connection.slug, table)}
-              isActive={
-                appView?.database === connection.slug && appView.table === table
-              }
+              onClick={() => changeAppView(serverId, connection.id, table)}
+              isActive={isActive && appView.table === table}
             />
           ))}
         </CollapsibleContent>

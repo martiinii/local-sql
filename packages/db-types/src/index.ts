@@ -24,7 +24,26 @@ export type DBConnectionStatus =
       error: string;
     };
 
-export type DBConnectionResponse = {
+export type DBAddResponse = {
   connectionStatus: DBConnectionStatus;
   tables?: TableWithSchema[];
 };
+
+export type DBConnectionResponse = {
+  id: string;
+  name: string;
+  isConnected: boolean;
+  tables: TableWithSchema[];
+};
+
+export type ServerConnectResponse = {
+  isConnected: boolean;
+  connections: DBConnectionResponse[];
+};
+
+export type ServersInitializeResponse = ServerConnectResponse & {
+  id: string;
+  name: string;
+};
+
+export const LOCAL_SERVER_ID = "local";

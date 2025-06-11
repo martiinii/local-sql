@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppStore } from "@/store/app.store";
-import { useConnectionStore } from "@/store/connections.store";
+import { useServersStore } from "@/store/servers.store";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,24 +13,40 @@ import { useMemo } from "react";
 
 export const MenuBreadcrumbs = () => {
   const appView = useAppStore((state) => state.view);
-  const getConnectionBySlug = useConnectionStore(
-    (state) => state.getConnectionBySlug,
-  );
+  const getServerById = useServersStore((state) => state.getServerById);
 
-  const connectionName = useMemo(() => {
-    if (!appView?.database) return null;
-    return getConnectionBySlug(appView.database)?.name;
-  }, [getConnectionBySlug, appView?.database]);
+  const currentConnectionName = useMemo(() => {
+    if (!appView?.serverId) return null;
+    const server = getServerById(appView.serverId);
+    const connection = server?.connections.find(
+      (conn) => conn.id === appView.databaseId,
+    );
+
+    return {
+      serverName: server?.name,
+      connectionName: connection?.name,
+    };
+  }, [getServerById, appView?.serverId, appView?.databaseId]);
 
   if (!appView) return;
+
   return (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <Icons.Database />
-          {connectionName}
+          <Icons.Server />
+          {currentConnectionName?.serverName}
         </BreadcrumbItem>
+
         <BreadcrumbSeparator />
+
+        <BreadcrumbItem>
+          <Icons.Database />
+          {currentConnectionName?.connectionName}
+        </BreadcrumbItem>
+
+        <BreadcrumbSeparator />
+
         <BreadcrumbItem>
           <Icons.Table className="rotate-180" />
           {appView.table}

@@ -1,7 +1,7 @@
 "use client";
 import { api } from "@/lib/api";
 import { unwrapEdenQuery } from "@/lib/eden-query";
-import { useConnectionStore } from "@/store/connections.store";
+import { useServersStore } from "@/store/servers.store";
 import {
   type FormProps,
   handleFormSubmit,
@@ -25,8 +25,8 @@ export const CreateConnectionForm = ({
   onSuccess,
   onError,
 }: FormProps) => {
-  const addConnection = useConnectionStore((state) => state.addConnection);
-  const initializeSingleConnection = useConnectionStore(
+  const addConnection = useServersStore((state) => state.addConnection);
+  const initializeSingleConnection = useServersStore(
     (state) => state.initializeSingleConnection,
   );
 
