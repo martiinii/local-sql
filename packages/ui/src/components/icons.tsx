@@ -8,6 +8,7 @@ import {
   Plus,
   Power,
   Send,
+  Server,
   SquareTerminal,
   Sun,
   SunMoon,
@@ -32,6 +33,7 @@ export const Icons = {
   ChevronRight,
   Table: TableProperties,
   Database,
+  Server,
 };
 
 export type IconName = keyof typeof Icons;
