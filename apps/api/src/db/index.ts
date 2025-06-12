@@ -1,6 +1,5 @@
 import { drizzle } from "drizzle-orm/libsql";
-import { DB_PATH_FILE } from "drizzle.config";
-import { createDatabaseDirectory } from "./create-database-directory";
+import { DB_PATH_FILE, createDatabaseDirectory } from "./db-path";
 import { relations } from "./relations";
 
 await createDatabaseDirectory();
