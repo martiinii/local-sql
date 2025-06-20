@@ -17,6 +17,7 @@ export class Connections {
     this._serverUrl = serverUrl || null;
     this._serverToken = serverToken || null;
   }
+
   /**
    * Internal function to add database connection and query tables
    * @param id Database id
@@ -74,7 +75,7 @@ export class Connections {
   /**
    * Function to add multiple databases at once
    * @param connections Array of database connections (id, name and uri)
-   * @returns Databases connection response
+   * @returns Array of database connection responses
    */
   async add(
     connections: { id: string; name: string; uri: string }[],
@@ -93,8 +94,13 @@ export class Connections {
     return res;
   }
 
-  get(name: string): DatabaseConnection | null {
-    return this._connections.get(name) || null;
+  /**
+   * Get connection
+   * @param id Connection id
+   * @returns Connection response
+   */
+  get(id: string): DatabaseConnection | null {
+    return this._connections.get(id) || null;
   }
 
   get list(): DBConnectionResponse[] {
@@ -107,11 +113,18 @@ export class Connections {
     }));
   }
 
+  /**
+   * Disconnect database
+   * @param id Connection id
+   */
   async disconnect(id: string) {
     const connection = this._connections.get(id);
     await connection?.disconnect();
   }
 
+  /**
+   * Disconnect each database
+   */
   async disconnectAll() {
     const disconnectPromises: Promise<boolean>[] = [];
 

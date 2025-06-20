@@ -1,8 +1,9 @@
 "use client";
 
 import type {
+  DBConnectionResponse,
   DBConnectionStatus,
-  ServersInitializeResponse,
+  ServerConnectResponse,
   TableSchema,
   TableWithSchema,
 } from "@local-sql/db-types";
@@ -22,7 +23,7 @@ export type Connection = {
   schemas?: Map<string, TableSchema>;
 };
 
-export const transformDatabaseConnectionResponse = (
+export const transformDatabaseTablesResponse = (
   tablesWithSchema: TableWithSchema[] | null | undefined,
 ): Pick<Connection, "tables" | "schemas"> => {
   if (!tablesWithSchema)
@@ -43,28 +44,70 @@ export const transformDatabaseConnectionResponse = (
   };
 };
 
+const transformDatabaseConnectionResponse = ({
+  isConnected,
+  tables,
+  ...data
+}: DBConnectionResponse): Connection => {
+  return {
+    ...data,
+    connectionStatus: isConnected
+      ? ({
+          value: "connected",
+        } as const)
+      : ({
+          value: "disconnected",
+        } as const),
+    ...transformDatabaseTablesResponse(tables),
+  };
+};
+
+const transformServerConnectResponse = ({
+  connections,
+  ...data
+}: ServerConnectResponse): Server => {
+  return {
+    ...data,
+    connections: connections.map(transformDatabaseConnectionResponse),
+  };
+};
+
+const transformPartialServerConnectResponse = (
+  data: Partial<
+    Pick<ServerConnectResponse, "isConnected" | "name" | "connections">
+  >,
+): Partial<Server> => {
+  if ("connections" in data && data.connections) {
+    const { connections, ...updates } = data;
+    return {
+      ...updates,
+      connections: connections.map(transformDatabaseConnectionResponse),
+    };
+  }
+
+  return { ...data } as Partial<
+    Pick<ServerConnectResponse, "isConnected" | "name">
+  >;
+};
+
 interface ServersStoreState {
-  //   connections: Connection[];
-  //   getConnectionBySlug: (slug: string) => Connection | undefined;
-  //   addConnection: (connectionData: Omit<PersistedConnection, "slug">) => string;
-  //   removeConnection: (slug: string) => void;
-  //   updateConnectionDetails: (
-  //     slug: string,
-  //     updates: Partial<
-  //       Pick<Connection, "connectionStatus" | "tables" | "schemas">
-  //     >,
-  //   ) => void;
-  //   initializeSingleConnection: (
-  //     slug: string,
-  //     state: DBConnectionResponse | null,
-  //   ) => void;
-  //   initialize: (state: DBConnectionResponse[]) => void;
   servers: Server[];
   getServerById: (serverId: string) => Server | undefined;
+  addServer: (server: ServerConnectResponse) => void;
+  deleteServer: (serverId: string) => void;
+  updateServerData: (
+    serverId: string,
+    updates: Partial<
+      Pick<ServerConnectResponse, "isConnected" | "name" | "connections">
+    >,
+  ) => void;
+
   getDatabaseById: (
     serverId: string,
     databaseId: string,
   ) => Connection | undefined;
+  addDatabase: (serverId: string, data: Connection) => void;
+
   updateDatabaseData: (
     serverId: string,
     databaseId: string,
@@ -72,7 +115,8 @@ interface ServersStoreState {
       Pick<Connection, "connectionStatus" | "schemas" | "tables">
     >,
   ) => void;
-  initialize: (state: ServersInitializeResponse[]) => void;
+
+  initialize: (state: ServerConnectResponse[]) => void;
 }
 
 export const useServersStore = create<ServersStoreState>()((set, get) => ({
@@ -81,11 +125,49 @@ export const useServersStore = create<ServersStoreState>()((set, get) => ({
   getServerById: (serverId) => {
     return get().servers.find((server) => server.id === serverId);
   },
+  addServer: (server) => {
+    set((state) => ({
+      servers: [...state.servers, transformServerConnectResponse(server)],
+    }));
+  },
+  deleteServer: (serverId) => {
+    set((state) => ({
+      servers: state.servers.filter((server) => server.id !== serverId),
+    }));
+  },
+  updateServerData: (serverId, updates) => {
+    set((state) => ({
+      servers: state.servers.map((server) => {
+        if (server.id === serverId) {
+          return {
+            ...server,
+            ...transformPartialServerConnectResponse(updates),
+          };
+        }
+
+        return server;
+      }),
+    }));
+  },
   getDatabaseById: (serverId, databaseId) => {
     return get()
       .getServerById(serverId)
       ?.connections.find((conn) => conn.id === databaseId);
   },
+  addDatabase: (serverId, data) => {
+    set((state) => ({
+      servers: state.servers.map((server) => {
+        if (server.id === serverId) {
+          return {
+            ...server,
+            connections: [...server.connections, data],
+          };
+        }
+        return server;
+      }),
+    }));
+  },
+
   updateDatabaseData: (serverId, databaseId, updates) => {
     set((state) => ({
       servers: state.servers.map((server) => {
@@ -101,25 +183,10 @@ export const useServersStore = create<ServersStoreState>()((set, get) => ({
       }),
     }));
   },
+
   initialize: (data) => {
     set({
-      servers: data.map((server) => ({
-        id: server.id,
-        name: server.name,
-        isConnected: server.isConnected,
-        connections: server.connections.map((conn) => ({
-          id: conn.id,
-          name: conn.name,
-          connectionStatus: conn.isConnected
-            ? {
-                value: "connected",
-              }
-            : {
-                value: "disconnected",
-              },
-          ...transformDatabaseConnectionResponse(conn.tables),
-        })),
-      })),
+      servers: data.map(transformServerConnectResponse),
     });
   },
 }));

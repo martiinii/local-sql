@@ -2,6 +2,7 @@ import {
   ChevronRight,
   Computer,
   Database,
+  Ellipsis,
   LifeBuoy,
   Loader2,
   MoonStar,
@@ -9,10 +10,12 @@ import {
   Power,
   Send,
   Server,
+  Settings,
   SquareTerminal,
   Sun,
   SunMoon,
   TableProperties,
+  Trash2,
   Unplug,
   Wrench,
 } from "lucide-react";
@@ -34,6 +37,9 @@ export const Icons = {
   Table: TableProperties,
   Database,
   Server,
+  Ellipsis,
+  Settings,
+  Trash: Trash2,
 };
 
 export type IconName = keyof typeof Icons;

@@ -37,13 +37,10 @@ export type DBConnectionResponse = {
 };
 
 export type ServerConnectResponse = {
-  isConnected: boolean;
-  connections: DBConnectionResponse[];
-};
-
-export type ServersInitializeResponse = ServerConnectResponse & {
   id: string;
   name: string;
+  isConnected: boolean;
+  connections: DBConnectionResponse[];
 };
 
 export const LOCAL_SERVER_ID = "local";

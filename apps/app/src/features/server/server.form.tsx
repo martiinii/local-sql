@@ -1,5 +1,4 @@
 "use client";
-import { query } from "@/query";
 import {
   type FormProps,
   handleFormSubmit,
@@ -8,47 +7,48 @@ import {
 import { Input } from "@local-sql/ui/components/input";
 import { ShadowBox } from "@local-sql/ui/components/shadow-box";
 import { SubmitButton } from "@local-sql/ui/components/submit-button";
+import type { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { type } from "arktype";
 
-const CreateConnectionSchema = type({
+const ServerSchema = type({
   "+": "delete",
   name: "string > 0",
-  uri: type("string.url").configure({ actual: "" }),
+  url: type("string.url").configure({ actual: "" }),
+  "token?": "string",
 });
 
-type CreateConnectionFormProps = FormProps & {
-  serverId: string;
+export type ServerFormProps = FormProps & {
+  defaultValues?: typeof ServerSchema.inferIn;
+  action: UseMutateAsyncFunction<
+    unknown,
+    Error,
+    typeof ServerSchema.inferOut,
+    unknown
+  >;
+  actionLabel: string;
 };
-export const CreateConnectionForm = ({
-  serverId,
+export const ServerForm = ({
   className,
   noShadow,
   onSuccess,
   onError,
-}: CreateConnectionFormProps) => {
-  const { mutateAsync: createConnection } = query.database.useCreateDatabase();
-
+  defaultValues,
+  action,
+  actionLabel,
+}: ServerFormProps) => {
   const form = useForm({
     validators: {
-      onSubmit: CreateConnectionSchema,
+      onSubmit: ServerSchema,
     },
-    defaultValues: {
-      name: "",
-      uri: "",
-    },
+    defaultValues,
     onSubmit: async ({ value }) => {
-      await createConnection(
-        {
-          serverId,
-          ...value,
-        },
-        {
-          onSuccess,
-          onError,
-        },
-      );
+      await action(value, {
+        onSuccess,
+        onError,
+      });
     },
   });
+
   return (
     <form.AppForm>
       <form onSubmit={handleFormSubmit(form)}>
@@ -57,7 +57,7 @@ export const CreateConnectionForm = ({
             <form.AppField name="name">
               {(field) => (
                 <field.FormItem>
-                  <field.FormLabel>Database name</field.FormLabel>
+                  <field.FormLabel>Name</field.FormLabel>
                   <field.FormControl>
                     <Input field={field} />
                   </field.FormControl>
@@ -66,17 +66,30 @@ export const CreateConnectionForm = ({
               )}
             </form.AppField>
 
-            <form.AppField name="uri">
+            <form.AppField name="url">
               {(field) => (
                 <field.FormItem>
-                  <field.FormLabel>Database URI</field.FormLabel>
+                  <field.FormLabel>Server URL</field.FormLabel>
                   <field.FormControl>
                     <Input
-                      placeholder="postgresql://..."
-                      type="password"
-                      autoComplete="new-password"
+                      placeholder="https://example.com:57597"
                       field={field}
                     />
+                  </field.FormControl>
+                  <field.FormMessage />
+                </field.FormItem>
+              )}
+            </form.AppField>
+
+            <form.AppField name="token">
+              {(field) => (
+                <field.FormItem>
+                  <field.FormLabel>Token</field.FormLabel>
+                  <field.FormDescription>
+                    Leave blank if your remote instance is not protected
+                  </field.FormDescription>
+                  <field.FormControl>
+                    <Input placeholder="" field={field} />
                   </field.FormControl>
                   <field.FormMessage />
                 </field.FormItem>
@@ -85,7 +98,7 @@ export const CreateConnectionForm = ({
           </div>
 
           <SubmitButton isSubmitting={form.state.isSubmitting}>
-            Save database
+            {actionLabel}
           </SubmitButton>
         </ShadowBox>
       </form>

@@ -1,31 +1,35 @@
-"use client";
-
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@local-sql/ui/components/dialog";
-import { type PropsWithChildren, useState } from "react";
+import type { OnChangeFn } from "@tanstack/react-table";
 import { CreateConnectionForm } from "./create-connection.form";
 
-export const CreateConnectionDialog = ({ children }: PropsWithChildren) => {
-  const [isOpen, setIsOpen] = useState(false);
-
+type CreateConnectionDialogProps = {
+  serverId: string;
+  isOpen: boolean;
+  setIsOpen: OnChangeFn<boolean>;
+};
+export const CreateConnectionDialog = ({
+  serverId,
+  isOpen,
+  setIsOpen,
+}: CreateConnectionDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create new connection</DialogTitle>
-          <DialogDescription>
-            Data will be saved locally and shared only with your Local SQL
-            server
-          </DialogDescription>
+          <DialogTitle>Add database connection</DialogTitle>
+          <DialogDescription />
         </DialogHeader>
-        <CreateConnectionForm noShadow onSuccess={() => setIsOpen(false)} />
+        <CreateConnectionForm
+          noShadow
+          serverId={serverId}
+          onSuccess={() => setIsOpen(false)}
+        />
       </DialogContent>
     </Dialog>
   );

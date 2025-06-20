@@ -1,6 +1,6 @@
 import {
   LOCAL_SERVER_ID,
-  type ServersInitializeResponse,
+  type ServerConnectResponse,
 } from "@local-sql/db-types";
 import { eq } from "drizzle-orm";
 import { LOCAL_SERVER_URL } from "../constants";
@@ -9,9 +9,11 @@ import { server } from "../db/schema/server";
 import { Server } from "./server";
 
 export class Servers {
-  //   private _serversIds: Set<string> = new Set();
   private _servers: Map<string, Server> = new Map();
 
+  has(id: string): boolean {
+    return this._servers.has(id);
+  }
   get(id: string) {
     return this._servers.get(id);
   }
@@ -28,24 +30,46 @@ export class Servers {
   }
 
   /**
-   * Initialize and connect with local-sql servers (local included)
-   * @returns Array of servers (id, isConnected, connections)
+   * Establish connection with server
+   * @param id serverId
+   * @param force If true, skips cache
+   * @returns Server connection response
    */
-  async initialize(): Promise<ServersInitializeResponse[]> {
+  async connectServer(
+    id: string,
+    force?: boolean,
+  ): Promise<ServerConnectResponse | null> {
+    const server = this._servers.get(id);
+    if (!server) return null;
+
+    const connectionData = await server.connect(force);
+
+    return {
+      id,
+      name: server.name,
+      ...connectionData,
+    };
+  }
+
+  /**
+   * Initialize and connect with local-sql servers (local included)
+   * @returns Array of server connection responses
+   */
+  async initialize(): Promise<ServerConnectResponse[]> {
     const servers = await db.query.server.findMany();
-    // const ids = servers.map((server) => server.id);
 
-    const serversData: [string, Server][] = servers.map((server) => [
-      server.id,
-      this._servers.get(server.id) ||
-        new Server({
-          name: server.name,
-          url: server.url,
-          token: server.token,
-        }),
-    ]);
+    const serversData: [string, Server][] = await Promise.all(
+      servers.map(async (server) => [
+        server.id,
+        this._servers.get(server.id) ||
+          new Server({
+            name: server.name,
+            url: server.url,
+            token: server.token,
+          }),
+      ]),
+    );
 
-    // this._serversIds = new Set([LOCAL_SERVER_ID, ...ids]);
     this._servers = new Map([
       [
         LOCAL_SERVER_ID,
@@ -58,7 +82,7 @@ export class Servers {
       ...serversData,
     ]);
 
-    const serverConnectPromises: Promise<ServersInitializeResponse>[] = [];
+    const serverConnectPromises: Promise<ServerConnectResponse>[] = [];
 
     for (const [serverId, server] of this._servers) {
       const connect = async () => {
@@ -77,13 +101,64 @@ export class Servers {
     return await Promise.all(serverConnectPromises);
   }
 
-  async add(data: Omit<typeof server.$inferInsert, "id">) {
-    await db.insert(server).values(data);
-    await this.initialize();
+  /**
+   * Add server to database and connect
+   * @param data Server name, url and token
+   * @returns Server connection response
+   */
+  async add({
+    token,
+    ...data
+  }: Omit<typeof server.$inferInsert, "id">): Promise<ServerConnectResponse> {
+    const [newServer] = await db
+      .insert(server)
+      .values({ ...data, token: token?.trim() || undefined })
+      .returning();
+
+    const serverInstance = new Server({
+      name: newServer.name,
+      url: newServer.url,
+      token: newServer.token,
+    });
+
+    this._servers.set(newServer.id, serverInstance);
+    return (await this.connectServer(newServer.id, true))!;
   }
 
+  /**
+   * Updates and saved new data to database
+   * @param data Data to update
+   * @returns Server connection response
+   */
+  async update({
+    id,
+    token: rawToken,
+    ...data
+  }: typeof server.$inferInsert & {
+    id: string;
+  }): Promise<ServerConnectResponse | null> {
+    const token = rawToken?.trim() || undefined;
+    await db
+      .update(server)
+      .set({
+        ...data,
+        token,
+      })
+      .where(eq(server.id, id))
+      .returning();
+
+    const serverToUpdate = this._servers.get(id);
+    serverToUpdate?.update({ ...data, token });
+
+    return await this.connectServer(id);
+  }
+
+  /**
+   * Deletes server from database
+   * @param id Server id
+   */
   async delete(id: string) {
     await db.delete(server).where(eq(server.id, id));
-    await this.initialize();
+    this._servers.delete(id);
   }
 }

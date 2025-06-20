@@ -1,32 +1,10 @@
 import { api } from "@/lib/api";
 import { useCreateMutation } from "@/lib/create-mutation";
 import { unwrapEdenQuery } from "@/lib/eden-query";
-import { useAppStore } from "@/store/app.store";
 import {
-  transformDatabaseConnectionResponse,
+  transformDatabaseTablesResponse,
   useServersStore,
 } from "@/store/servers.store";
-
-export const useInitialize = (hideToastError?: boolean) => {
-  const storeInitialize = useServersStore((state) => state.initialize);
-
-  const storeUpdateAppConnection = useAppStore((state) => state.setIsConnected);
-  const storeIncrementAttemptsCount = useAppStore(
-    (state) => state.incrementConnectionAttempts,
-  );
-
-  return useCreateMutation({
-    mutationFn: () => unwrapEdenQuery(api.init.post)(),
-    onSuccess: (data) => {
-      storeInitialize(data);
-      storeUpdateAppConnection(true);
-    },
-    onSettled: () => {
-      storeIncrementAttemptsCount();
-    },
-    onErrorShowToast: !hideToastError,
-  });
-};
 
 export const useConnectDatabase = () => {
   const storeUpdateConnection = useServersStore(
@@ -44,9 +22,7 @@ export const useConnectDatabase = () => {
       return { connectionStatus: isConnected, tables };
     },
     onSuccess: (data, { serverId, databaseId }) => {
-      const transformedTables = transformDatabaseConnectionResponse(
-        data.tables,
-      );
+      const transformedTables = transformDatabaseTablesResponse(data.tables);
 
       storeUpdateConnection(serverId, databaseId, {
         ...transformedTables,
@@ -62,6 +38,28 @@ export const useConnectDatabase = () => {
           error: error.message,
         },
       });
+    },
+  });
+};
+
+export const useCreateDatabase = () => {
+  const storeSetDatabases = useServersStore((state) => state.updateServerData);
+  const storeUpdateServer = useServersStore((state) => state.updateServerData);
+
+  return useCreateMutation({
+    mutationFn: async ({
+      serverId,
+      ...data
+    }: { serverId: string; name: string; uri: string }) => {
+      return await unwrapEdenQuery(
+        api.server.local.database.post, // TODO change local to serverId after endpoint is ready
+      )(data);
+    },
+    onSuccess: (data, { serverId }) => {
+      storeSetDatabases(serverId, { connections: data.connections });
+    },
+    onError: (_, { serverId }) => {
+      storeUpdateServer(serverId, { isConnected: false });
     },
   });
 };
