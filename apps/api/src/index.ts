@@ -21,8 +21,18 @@ export const app = new Elysia({
       documentation: {
         info: {
           title: "Local SQL Server API Documentation",
-          version: "1.0.0",
+          version: "",
         },
+        tags: [
+          {
+            name: "Initialize",
+            description: "Initialize endpoint",
+          },
+          {
+            name: "Server",
+            description: "Manage servers",
+          },
+        ],
       },
     }),
   )

@@ -9,7 +9,17 @@ export const initRouter = new Elysia({
   adapter: adapter,
 })
   .use(setupPlugin)
-  .post("/", async ({ store: { servers } }) => {
-    const res = await servers.initialize();
-    return res;
-  });
+  .post(
+    "/",
+    async ({ store: { servers } }) => {
+      const res = await servers.initialize();
+      return res;
+    },
+    {
+      detail: {
+        summary: "Initialize server instance",
+        description:
+          "Queries remote instances of local-sql, establishes connections and fetches local and remote connections",
+      },
+    },
+  );
