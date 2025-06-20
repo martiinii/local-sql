@@ -34,6 +34,9 @@ export const app = new Elysia({
           },
         ],
       },
+      scalarConfig: {
+        favicon: "/public/favicon.svg",
+      },
     }),
   )
   .use(initRouter)

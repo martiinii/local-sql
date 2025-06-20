@@ -1,4 +1,5 @@
 import cors from "@elysiajs/cors";
+import { staticPlugin } from "@elysiajs/static";
 import Elysia from "elysia";
 import { serversStore } from "../store/servers.store";
 import { errorHandlerPlugin } from "./error-handler.plugin";
@@ -7,6 +8,7 @@ import { prettyLogPlugin } from "./pretty-log.plugin";
 
 export const setupPlugin = new Elysia({ name: "setup" })
   .use(cors())
+  .use(staticPlugin())
   .use(prettyLogPlugin)
   .use(errorHandlerPlugin)
   .use(loggerPlugin)
