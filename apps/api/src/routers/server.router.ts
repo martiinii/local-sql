@@ -10,9 +10,11 @@ export const serverRouter = new Elysia({
   adapter: adapter,
 })
   .use(setupPlugin)
+  // List all servers
   .get("/", async ({ store: { servers } }) => {
     return servers.list;
   })
+  // Add server
   .post(
     "/",
     async ({ body, store: { servers } }) => {
@@ -26,10 +28,12 @@ export const serverRouter = new Elysia({
       }),
     },
   )
+  // Delete server
   .delete("/:serverId", async ({ params, store: { servers }, status }) => {
     if (!servers.has(params.serverId)) return status(404, "Server not found");
     return await servers.delete(params.serverId);
   })
+  // Get server data
   .get("/:serverId", ({ params, store: { servers }, status }) => {
     const server = servers.get(params.serverId);
     if (!server) return status(404, "Server not found");
@@ -40,6 +44,7 @@ export const serverRouter = new Elysia({
       connections: server.connections.list,
     };
   })
+  // Update server data
   .put(
     "/:serverId",
     async ({ body, params, store: { servers }, status }) => {
@@ -60,6 +65,7 @@ export const serverRouter = new Elysia({
     },
   )
   // Local server instance
+  // Add database
   .post(
     `/${LOCAL_SERVER_ID}/database`,
     async ({ body, store: { servers }, status }) => {
@@ -86,6 +92,7 @@ export const serverRouter = new Elysia({
       }),
     },
   )
+  // Connect to database
   .post(
     `/${LOCAL_SERVER_ID}/database/:databaseId/connect`,
     async ({ params, store: { servers }, status }) => {
@@ -116,6 +123,7 @@ export const serverRouter = new Elysia({
       };
     },
   )
+  // Disconnect database
   .post(
     `/${LOCAL_SERVER_ID}/database/:databaseId/disconnect`,
     async ({ params, store: { servers }, status }) => {
@@ -142,6 +150,27 @@ export const serverRouter = new Elysia({
       } as const;
     },
   )
+  // Delete database
+  .delete(
+    `/${LOCAL_SERVER_ID}/database/:databaseId`,
+    async ({ params, store: { servers }, status }) => {
+      const server = servers.get(LOCAL_SERVER_ID);
+      if (!server) return status(404, "Server not found");
+
+      // Should always be connected to local server, but we can perform additional check
+      if (!server.isConnected) {
+        const connectResponse = await server.connect();
+        if (!connectResponse.isConnected)
+          return status(
+            503,
+            "An error occured while connecting to local instance of local-sql server",
+          );
+      }
+
+      await server.removeConnection(params.databaseId);
+    },
+  )
+  // Get database tables
   .get(
     `/${LOCAL_SERVER_ID}/database/:databaseId/tables`,
     async ({ params, store: { servers }, status }) => {
@@ -166,6 +195,7 @@ export const serverRouter = new Elysia({
       return res;
     },
   )
+  // Get data from table
   .get(
     `/${LOCAL_SERVER_ID}/database/:databaseId/data/:table`,
     async ({ params, store: { servers }, status }) => {
@@ -192,6 +222,7 @@ export const serverRouter = new Elysia({
     },
   )
   // Other servers (local server is used as gateway)
+  // Connect to server
   .post(
     "/:serverId/connect",
     async ({ params, store: { servers }, status }) => {
@@ -202,6 +233,7 @@ export const serverRouter = new Elysia({
       return response;
     },
   )
+  // Connect to database
   .post(
     "/:serverId/database/:databaseId/connect",
     async ({ params, store: { servers }, status }) => {
@@ -231,6 +263,7 @@ export const serverRouter = new Elysia({
       }
     },
   )
+  // Disconnect database
   .post(
     "/:serverId/database/:databaseId/disconnect",
     async ({ params, store: { servers }, status }) => {
@@ -264,6 +297,41 @@ export const serverRouter = new Elysia({
       }
     },
   )
+  // Delete database
+  .delete(
+    "/:serverId/database/:databaseId",
+    async ({ params, store: { servers }, status }) => {
+      const server = servers.get(params.serverId);
+      if (!server) return status(404, "Server not found");
+
+      // Should always be connected to local server, but we can perform additional check
+      if (!server.isConnected) {
+        const connectResponse = await server.connect();
+        if (!connectResponse.isConnected)
+          return status(
+            503,
+            "An error occured while connecting to remote instance of local-sql server",
+          );
+      }
+
+      try {
+        const response = await server.gatewayApi.server.local
+          .database({ databaseId: params.databaseId })
+          .delete();
+        if (response.error) {
+          return status(response.error.status, response.error.value);
+        }
+
+        return response.data;
+      } catch {
+        return status(
+          503,
+          "An error occured while fetching this database tables",
+        );
+      }
+    },
+  )
+  // Get database tables
   .get(
     "/:serverId/database/:databaseId/tables",
     async ({ params, store: { servers }, status }) => {
@@ -297,6 +365,7 @@ export const serverRouter = new Elysia({
       }
     },
   )
+  // Get data from table
   .get(
     "/:serverId/database/:databaseId/data/:table",
     async ({ params, store: { servers }, status }) => {

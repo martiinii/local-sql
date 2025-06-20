@@ -42,6 +42,54 @@ export const useConnectDatabase = () => {
   });
 };
 
+export const useDisconnectDatabase = () => {
+  const storeUpdateConnection = useServersStore(
+    (state) => state.updateDatabaseData,
+  );
+
+  return useCreateMutation({
+    mutationFn: async ({
+      serverId,
+      databaseId,
+    }: { serverId: string; databaseId: string }) => {
+      const data = await unwrapEdenQuery(
+        api.server({ serverId }).database({ databaseId }).disconnect.post,
+      )();
+
+      return data;
+    },
+    onSuccess: (data, { serverId, databaseId }) => {
+      storeUpdateConnection(serverId, databaseId, {
+        connectionStatus: {
+          value: data.connectionStatus ? "connected" : "disconnected",
+        },
+      });
+    },
+  });
+};
+
+export const useDeleteDatabase = () => {
+  const storeDeleteConnection = useServersStore(
+    (state) => state.deleteDatabase,
+  );
+
+  return useCreateMutation({
+    mutationFn: async ({
+      serverId,
+      databaseId,
+    }: { serverId: string; databaseId: string }) => {
+      const data = await unwrapEdenQuery(
+        api.server({ serverId }).database({ databaseId }).delete,
+      )();
+
+      return data;
+    },
+    onSuccess: (_, { serverId, databaseId }) => {
+      storeDeleteConnection(serverId, databaseId);
+    },
+  });
+};
+
 export const useCreateDatabase = () => {
   const storeSetDatabases = useServersStore((state) => state.updateServerData);
   const storeUpdateServer = useServersStore((state) => state.updateServerData);

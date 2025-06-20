@@ -107,7 +107,7 @@ interface ServersStoreState {
     databaseId: string,
   ) => Connection | undefined;
   addDatabase: (serverId: string, data: Connection) => void;
-
+  deleteDatabase: (serverId: string, databaseId: string) => void;
   updateDatabaseData: (
     serverId: string,
     databaseId: string,
@@ -167,7 +167,21 @@ export const useServersStore = create<ServersStoreState>()((set, get) => ({
       }),
     }));
   },
-
+  deleteDatabase: (serverId, databaseId) => {
+    set((state) => ({
+      servers: state.servers.map((server) => {
+        if (server.id === serverId) {
+          return {
+            ...server,
+            connections: server.connections.filter(
+              (conn) => conn.id !== databaseId,
+            ),
+          };
+        }
+        return server;
+      }),
+    }));
+  },
   updateDatabaseData: (serverId, databaseId, updates) => {
     set((state) => ({
       servers: state.servers.map((server) => {

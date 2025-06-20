@@ -9,11 +9,18 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@local-sql/ui/components/collapsible";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@local-sql/ui/components/context-menu";
 import { Icons } from "@local-sql/ui/components/icons";
 import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@local-sql/ui/components/sidebar";
+import type { PropsWithChildren } from "react";
 import { DatabaseTableSubItem } from "./database-table-subitem";
 
 type DatabaseMenuItemProps = {
@@ -43,14 +50,18 @@ const DisconnectedDatabaseMenuItem = ({
 
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton
-        onClick={() => connect({ serverId, databaseId: connection.id })}
-        disabled={isPending}
-      >
-        <ConnectionStatus connectionStatus={connection.connectionStatus} />
-        <span className="grow truncate">{connection.name}</span>
-        <Icons.Connect className="text-muted-foreground group-hover/menu-item:text-primary transition-colors" />
-      </SidebarMenuButton>
+      <DatabaseItemContextMenu serverId={serverId} databaseId={connection.id}>
+        <ContextMenuTrigger asChild>
+          <SidebarMenuButton
+            onClick={() => connect({ serverId, databaseId: connection.id })}
+            disabled={isPending}
+          >
+            <ConnectionStatus connectionStatus={connection.connectionStatus} />
+            <span className="grow truncate">{connection.name}</span>
+            <Icons.Connect className="text-muted-foreground group-hover/menu-item:text-primary transition-colors" />
+          </SidebarMenuButton>
+        </ContextMenuTrigger>
+      </DatabaseItemContextMenu>
     </SidebarMenuItem>
   );
 };
@@ -72,13 +83,24 @@ const ConnectedDatabaseMenuItem = ({
       defaultOpen={connection.connectionStatus.value === "connected"}
     >
       <SidebarMenuItem>
-        <CollapsibleTrigger asChild>
-          <SidebarMenuButton isActive={isActive}>
-            <ConnectionStatus connectionStatus={connection.connectionStatus} />
-            <span className="truncate">{connection.name}</span>
-            <Icons.ChevronRight className="ml-auto transition-transform group-data-[state=open]/menu-item:rotate-90" />
-          </SidebarMenuButton>
-        </CollapsibleTrigger>
+        <DatabaseItemContextMenu
+          isConnected
+          serverId={serverId}
+          databaseId={connection.id}
+        >
+          <ContextMenuTrigger asChild>
+            <CollapsibleTrigger asChild>
+              <SidebarMenuButton isActive={isActive}>
+                <ConnectionStatus
+                  connectionStatus={connection.connectionStatus}
+                />
+                <span className="truncate">{connection.name}</span>
+                <Icons.ChevronRight className="ml-auto transition-transform group-data-[state=open]/menu-item:rotate-90" />
+              </SidebarMenuButton>
+            </CollapsibleTrigger>
+          </ContextMenuTrigger>
+        </DatabaseItemContextMenu>
+
         <CollapsibleContent>
           {Array.from(connection.tables || []).map((table) => (
             <DatabaseTableSubItem
@@ -91,5 +113,45 @@ const ConnectedDatabaseMenuItem = ({
         </CollapsibleContent>
       </SidebarMenuItem>
     </Collapsible>
+  );
+};
+
+type DatabaseItemContextMenuProps = PropsWithChildren & {
+  serverId: string;
+  databaseId: string;
+  isConnected?: boolean;
+};
+const DatabaseItemContextMenu = ({
+  children,
+  serverId,
+  databaseId,
+  isConnected,
+}: DatabaseItemContextMenuProps) => {
+  const { mutate: diconnectDatabase } = query.database.useDisconnectDatabase();
+  const { mutate: deleteDatabase } = query.database.useDeleteDatabase();
+
+  const onDisconnect = () => {
+    diconnectDatabase({ serverId, databaseId });
+  };
+
+  const onRemove = () => {
+    deleteDatabase({ serverId, databaseId });
+  };
+
+  return (
+    <ContextMenu>
+      {children}
+      <ContextMenuContent>
+        {isConnected && (
+          <ContextMenuItem onClick={onDisconnect}>
+            <Icons.Disconnect /> Disconnect
+          </ContextMenuItem>
+        )}
+
+        <ContextMenuItem onClick={onRemove} variant="destructive">
+          <Icons.Disconnect /> Remove
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 };

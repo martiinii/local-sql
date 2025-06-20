@@ -2,6 +2,7 @@ import {
   LOCAL_SERVER_ID,
   type ServerConnectResponse,
 } from "@local-sql/db-types";
+import { eq } from "drizzle-orm";
 import { LOCAL_SERVER_URL } from "../constants";
 import { db } from "../db";
 import { connection } from "../db/schema/connection";
@@ -118,6 +119,17 @@ export class Server {
 
     this._isConnected = false;
     return await this.connect();
+  }
+
+  async removeConnection(databaseId: string) {
+    if (this.isLocalInstance) {
+      await db.delete(connection).where(eq(connection.id, databaseId));
+      await this._connections.deleteDatabase(databaseId);
+    } else {
+      // We are removing connection from remote instance of local-sql server
+      // TODO check permission
+      await this.gatewayApi.server.local.database({ databaseId }).delete();
+    }
   }
 
   /**

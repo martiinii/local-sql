@@ -134,4 +134,13 @@ export class Connections {
 
     await Promise.all(disconnectPromises);
   }
+
+  /**
+   * Delete database from set
+   * @param id Connection id
+   */
+  async deleteDatabase(id: string) {
+    await this.disconnect(id);
+    this._connections.delete(id);
+  }
 }
