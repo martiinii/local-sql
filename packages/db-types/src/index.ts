@@ -39,8 +39,11 @@ export type DBConnectionResponse = {
 export type ServerConnectResponse = {
   id: string;
   name: string;
+  permission: ServerPermission;
+  error?: string;
   isConnected: boolean;
   connections: DBConnectionResponse[];
 };
 
+export type ServerPermission = "none" | "read" | "write";
 export const LOCAL_SERVER_ID = "local";

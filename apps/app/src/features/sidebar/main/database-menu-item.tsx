@@ -3,7 +3,7 @@
 import { ConnectionStatus } from "@/features/connection/connection-status";
 import { query } from "@/query";
 import { useAppStore } from "@/store/app.store";
-import type { Connection } from "@/store/servers.store";
+import type { Connection, Server } from "@/store/servers.store";
 import {
   Collapsible,
   CollapsibleContent,
@@ -24,36 +24,38 @@ import type { PropsWithChildren } from "react";
 import { DatabaseTableSubItem } from "./database-table-subitem";
 
 type DatabaseMenuItemProps = {
-  serverId: string;
+  server: Server;
   connection: Connection;
 };
 export const DatabaseMenuItem = ({
-  serverId,
+  server,
   connection,
 }: DatabaseMenuItemProps) => {
   if (connection.connectionStatus.value === "connected") {
     return (
-      <ConnectedDatabaseMenuItem serverId={serverId} connection={connection} />
+      <ConnectedDatabaseMenuItem server={server} connection={connection} />
     );
   }
 
   return (
-    <DisconnectedDatabaseMenuItem serverId={serverId} connection={connection} />
+    <DisconnectedDatabaseMenuItem server={server} connection={connection} />
   );
 };
 
 const DisconnectedDatabaseMenuItem = ({
-  serverId,
+  server,
   connection,
 }: DatabaseMenuItemProps) => {
   const { mutate: connect, isPending } = query.database.useConnectDatabase();
 
   return (
     <SidebarMenuItem>
-      <DatabaseItemContextMenu serverId={serverId} databaseId={connection.id}>
+      <DatabaseItemContextMenu server={server} databaseId={connection.id}>
         <ContextMenuTrigger asChild>
           <SidebarMenuButton
-            onClick={() => connect({ serverId, databaseId: connection.id })}
+            onClick={() =>
+              connect({ serverId: server.id, databaseId: connection.id })
+            }
             disabled={isPending}
           >
             <ConnectionStatus connectionStatus={connection.connectionStatus} />
@@ -67,14 +69,14 @@ const DisconnectedDatabaseMenuItem = ({
 };
 
 const ConnectedDatabaseMenuItem = ({
-  serverId,
+  server,
   connection,
 }: DatabaseMenuItemProps) => {
   const appView = useAppStore((state) => state.view);
   const changeAppView = useAppStore((state) => state.setView);
 
   const isActive =
-    appView?.serverId === serverId && appView.databaseId === connection.id;
+    appView?.serverId === server.id && appView.databaseId === connection.id;
 
   return (
     <Collapsible
@@ -83,11 +85,7 @@ const ConnectedDatabaseMenuItem = ({
       defaultOpen={connection.connectionStatus.value === "connected"}
     >
       <SidebarMenuItem>
-        <DatabaseItemContextMenu
-          isConnected
-          serverId={serverId}
-          databaseId={connection.id}
-        >
+        <DatabaseItemContextMenu server={server} databaseId={connection.id}>
           <ContextMenuTrigger asChild>
             <CollapsibleTrigger asChild>
               <SidebarMenuButton isActive={isActive}>
@@ -106,7 +104,7 @@ const ConnectedDatabaseMenuItem = ({
             <DatabaseTableSubItem
               key={table}
               table={table}
-              onClick={() => changeAppView(serverId, connection.id, table)}
+              onClick={() => changeAppView(server.id, connection.id, table)}
               isActive={isActive && appView.table === table}
             />
           ))}
@@ -117,40 +115,42 @@ const ConnectedDatabaseMenuItem = ({
 };
 
 type DatabaseItemContextMenuProps = PropsWithChildren & {
-  serverId: string;
+  server: Server;
   databaseId: string;
-  isConnected?: boolean;
 };
 const DatabaseItemContextMenu = ({
   children,
-  serverId,
+  server,
   databaseId,
-  isConnected,
 }: DatabaseItemContextMenuProps) => {
+  const isReadOnly = server.permission === "read";
+
   const { mutate: diconnectDatabase } = query.database.useDisconnectDatabase();
   const { mutate: deleteDatabase } = query.database.useDeleteDatabase();
 
   const onDisconnect = () => {
-    diconnectDatabase({ serverId, databaseId });
+    diconnectDatabase({ serverId: server.id, databaseId });
   };
 
   const onRemove = () => {
-    deleteDatabase({ serverId, databaseId });
+    deleteDatabase({ serverId: server.id, databaseId });
   };
 
   return (
     <ContextMenu>
       {children}
       <ContextMenuContent>
-        {isConnected && (
+        {server.isConnected && (
           <ContextMenuItem onClick={onDisconnect}>
             <Icons.Disconnect /> Disconnect
           </ContextMenuItem>
         )}
 
-        <ContextMenuItem onClick={onRemove} variant="destructive">
-          <Icons.Disconnect /> Remove
-        </ContextMenuItem>
+        {!isReadOnly && (
+          <ContextMenuItem onClick={onRemove} variant="destructive">
+            <Icons.Disconnect /> Remove
+          </ContextMenuItem>
+        )}
       </ContextMenuContent>
     </ContextMenu>
   );

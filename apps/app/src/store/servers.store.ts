@@ -4,6 +4,7 @@ import type {
   DBConnectionResponse,
   DBConnectionStatus,
   ServerConnectResponse,
+  ServerPermission,
   TableSchema,
   TableWithSchema,
 } from "@local-sql/db-types";
@@ -13,6 +14,8 @@ export type Server = {
   id: string;
   name: string;
   isConnected: boolean;
+  permission: ServerPermission;
+  error?: string;
   connections: Connection[];
 };
 export type Connection = {
@@ -74,13 +77,17 @@ const transformServerConnectResponse = ({
 
 const transformPartialServerConnectResponse = (
   data: Partial<
-    Pick<ServerConnectResponse, "isConnected" | "name" | "connections">
+    Pick<
+      ServerConnectResponse,
+      "isConnected" | "name" | "connections" | "error" | "permission"
+    >
   >,
 ): Partial<Server> => {
   if ("connections" in data && data.connections) {
-    const { connections, ...updates } = data;
+    const { connections, error, ...updates } = data;
     return {
       ...updates,
+      error,
       connections: connections.map(transformDatabaseConnectionResponse),
     };
   }

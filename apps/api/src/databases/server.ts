@@ -1,6 +1,7 @@
 import {
   LOCAL_SERVER_ID,
   type ServerConnectResponse,
+  type ServerPermission,
 } from "@local-sql/db-types";
 import { eq } from "drizzle-orm";
 import { LOCAL_SERVER_URL } from "../constants";
@@ -19,19 +20,30 @@ export class Server {
   name: string;
   url: string;
 
+  private _permission: ServerPermission;
   private _isConnected = false;
   private _token: string | null = null;
   private _connections: Connections;
+  private _lastError?: string;
 
   gatewayApi: GatewayApi;
 
   constructor({ name, url, token }: ServerConstructor) {
+    this._permission = "none";
     this.name = name;
     this.url = url;
     this._token = token || null;
     this._connections = new Connections();
 
     this.gatewayApi = getGatewayApi(this.url, this._token);
+  }
+
+  get lastError() {
+    return this._lastError;
+  }
+
+  get permission() {
+    return this._permission;
   }
 
   get isConnected() {
@@ -54,14 +66,18 @@ export class Server {
   async connect(
     force?: boolean,
   ): Promise<Omit<ServerConnectResponse, "id" | "name">> {
+    this._lastError = undefined; // Reset last occured error
+
     if (!force && this._isConnected && this.isLocalInstance) {
       return {
         isConnected: true,
+        permission: this._permission,
         connections: this.connections.list,
       };
     }
 
     try {
+      this._permission = "none";
       this._connections = new Connections();
 
       if (this.isLocalInstance) {
@@ -69,9 +85,11 @@ export class Server {
 
         await this._connections.add(connections);
         this._isConnected = true;
+        this._permission = "write"; // We can only connect to local instance of local-sql from dashboard without token - we will always have write permission
 
         return {
           isConnected: true,
+          permission: this._permission,
           connections: this.connections.list,
         };
       }
@@ -83,21 +101,35 @@ export class Server {
 
       if (response.data) {
         this._isConnected = true;
+        this._permission = response.data.permission;
 
         // We don't want to store remote local-sql connections, just return them
         return {
           isConnected: true,
+          permission: this._permission,
           connections: response.data.connections,
         };
       }
 
+      this._lastError =
+        typeof response.error.value === "string"
+          ? response.error.value
+          : "Unknown error occured";
+
       return {
         isConnected: false,
+        permission: this._permission,
+        error: this._lastError,
         connections: [],
       };
-    } catch {
+    } catch (e) {
+      this._lastError =
+        e instanceof Error ? e.message : "Unknown error occured";
+
       return {
         isConnected: false,
+        permission: this._permission,
+        error: this._lastError,
         connections: this.connections.list,
       };
     }
@@ -147,6 +179,7 @@ export class Server {
 
     if (isConnectionChanged) {
       this._isConnected = false;
+      this.gatewayApi = getGatewayApi(this.url, this._token);
     }
   }
 }

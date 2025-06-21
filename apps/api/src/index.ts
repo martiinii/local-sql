@@ -10,6 +10,7 @@ import { prettyLog } from "./plugins/pretty-log.plugin";
 import { setupPlugin } from "./plugins/setup.plugin";
 import { initRouter } from "./routers/init.router";
 import { serverRouter } from "./routers/server.router";
+import { tokenRouter } from "./routers/token.router";
 
 export const app = new Elysia({
   adapter: adapter,
@@ -40,8 +41,8 @@ export const app = new Elysia({
     }),
   )
   .use(initRouter)
-  .use(serverRouter);
-//   .use(databaseRouter);
+  .use(serverRouter)
+  .use(tokenRouter);
 
 // Start listening on port
 const listen = async () => {

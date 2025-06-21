@@ -16,6 +16,7 @@ export const initRouter = new Elysia({
       return res;
     },
     {
+      requireToken: "read",
       detail: {
         summary: "Initialize server instance",
         description:

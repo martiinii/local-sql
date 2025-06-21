@@ -23,6 +23,9 @@ export class Servers {
       return {
         id,
         name: serverObject.name,
+        isConnected: serverObject.isConnected,
+        permission: serverObject.permission,
+        error: serverObject.lastError,
       };
     });
 

@@ -1,10 +1,10 @@
 import { init } from "@paralleldrive/cuid2";
 
-const TOKEN_PREFIX = "lsql";
-const TOKEN_LENGTH = 64;
+export const TOKEN_PREFIX = "lsql";
+export const TOKEN_KEY_LENGTH = 64;
 
 const createId = init({
-  length: TOKEN_LENGTH,
+  length: TOKEN_KEY_LENGTH,
 });
 
 export const createToken = () => {

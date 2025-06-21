@@ -1,6 +1,7 @@
 import cors from "@elysiajs/cors";
 import { staticPlugin } from "@elysiajs/static";
 import Elysia from "elysia";
+import { tokenMacro } from "../macro/token.macro";
 import { serversStore } from "../store/servers.store";
 import { errorHandlerPlugin } from "./error-handler.plugin";
 import { loggerPlugin } from "./logger.plugin";
@@ -12,4 +13,5 @@ export const setupPlugin = new Elysia({ name: "setup" })
   .use(prettyLogPlugin)
   .use(errorHandlerPlugin)
   .use(loggerPlugin)
-  .use(serversStore);
+  .use(serversStore)
+  .use(tokenMacro);

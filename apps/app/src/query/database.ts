@@ -99,9 +99,9 @@ export const useCreateDatabase = () => {
       serverId,
       ...data
     }: { serverId: string; name: string; uri: string }) => {
-      return await unwrapEdenQuery(
-        api.server.local.database.post, // TODO change local to serverId after endpoint is ready
-      )(data);
+      return await unwrapEdenQuery(api.server({ serverId }).database.post)(
+        data,
+      );
     },
     onSuccess: (data, { serverId }) => {
       storeSetDatabases(serverId, { connections: data.connections });

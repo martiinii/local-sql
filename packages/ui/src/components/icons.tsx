@@ -3,6 +3,7 @@ import {
   Computer,
   Database,
   Ellipsis,
+  Eye,
   LifeBuoy,
   Loader2,
   MoonStar,
@@ -16,6 +17,7 @@ import {
   SunMoon,
   TableProperties,
   Trash2,
+  TriangleAlert,
   Unplug,
   Wrench,
 } from "lucide-react";
@@ -40,6 +42,8 @@ export const Icons = {
   Ellipsis,
   Settings,
   Trash: Trash2,
+  TriangleAlert,
+  Eye,
 };
 
 export type IconName = keyof typeof Icons;

@@ -1,6 +1,7 @@
 "use client";
 
 import { CreateConnectionDialog } from "@/features/connection/create-connection.dialog";
+import { ServerStatusIcon } from "@/features/connection/server-status-icon";
 import { UpdateServerDialog } from "@/features/server/update-server.dialog";
 import { query } from "@/query";
 import type { Server } from "@/store/servers.store";
@@ -19,7 +20,7 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
 } from "@local-sql/ui/components/sidebar";
-import { useState } from "react";
+import { type PropsWithChildren, useState } from "react";
 import { DatabaseMenuItem } from "./database-menu-item";
 
 type ServerSidebarGroupProps = {
@@ -28,8 +29,6 @@ type ServerSidebarGroupProps = {
 export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
   const [isNewConnOpen, setIsNewConnOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
-
-  const isLocalServer = server.id === LOCAL_SERVER_ID;
 
   // Server data
   const { data: serverData, isLoading } = query.server.useServer({
@@ -42,16 +41,13 @@ export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
   };
 
   // Mutate
-  const { mutate: addConnection, isPending: isPendingAddConn } =
-    query.database.useCreateDatabase();
-
   const { mutate: connectServer, isPending: isPendingInitialize } =
     query.server.useConnect();
 
   const { mutate: removeServer, isPending: isPendingRemove } =
     query.server.useDeleteServer();
 
-  const isPending = isPendingAddConn || isPendingInitialize || isPendingRemove;
+  const isPending = isPendingInitialize || isPendingRemove;
 
   const onAddConnection = () => {
     setIsNewConnOpen(true);
@@ -68,8 +64,18 @@ export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{server.name}</SidebarGroupLabel>
-      <DropdownMenu>
+      <SidebarGroupLabel className="flex gap-2 items-center justify-between pr-8">
+        <span>{server.name}</span>
+        <ServerStatusIcon permission={server.permission} error={server.error} />
+      </SidebarGroupLabel>
+      <ServerSidebarDropdownMenu
+        server={server}
+        handlePrefetchServer={handlePrefetchServer}
+        onAddConnection={onAddConnection}
+        onReconnect={onReconnect}
+        onEdit={onEdit}
+        onRemove={onRemove}
+      >
         <DropdownMenuTrigger asChild disabled={isPending}>
           <SidebarGroupAction title="Options">
             {isPending ? (
@@ -80,32 +86,7 @@ export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
             <span className="sr-only">Options</span>
           </SidebarGroupAction>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={onAddConnection}>
-            <Icons.Plus /> Add connection
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={onReconnect}>
-            <Icons.Disconnect />
-            Reconnect
-          </DropdownMenuItem>
-          {!isLocalServer && (
-            <>
-              <DropdownMenuItem
-                onClick={onEdit}
-                onMouseEnter={handlePrefetchServer}
-                onFocus={handlePrefetchServer}
-              >
-                <Icons.Settings />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" onClick={onRemove}>
-                <Icons.Trash />
-                Remove
-              </DropdownMenuItem>
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      </ServerSidebarDropdownMenu>
       <CreateConnectionDialog
         serverId={server.id}
         isOpen={isNewConnOpen}
@@ -125,14 +106,65 @@ export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
       <SidebarGroupContent>
         <SidebarMenu>
           {server.connections.map((conn) => (
-            <DatabaseMenuItem
-              key={conn.id}
-              serverId={server.id}
-              connection={conn}
-            />
+            <DatabaseMenuItem key={conn.id} server={server} connection={conn} />
           ))}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
+  );
+};
+
+type ServerSidebarDropdownMenuProps = PropsWithChildren & {
+  server: Server;
+  onAddConnection: () => void;
+  onReconnect: () => void;
+  onEdit: () => void;
+  handlePrefetchServer: () => void;
+  onRemove: () => void;
+};
+const ServerSidebarDropdownMenu = ({
+  children,
+  server,
+  onAddConnection,
+  onReconnect,
+  onEdit,
+  handlePrefetchServer,
+  onRemove,
+}: ServerSidebarDropdownMenuProps) => {
+  const isLocalServer = server.id === LOCAL_SERVER_ID;
+  const isReadOnly = server.permission === "read";
+
+  return (
+    <DropdownMenu>
+      {children}
+      <DropdownMenuContent>
+        {server.isConnected && !isReadOnly && (
+          <DropdownMenuItem onClick={onAddConnection}>
+            <Icons.Plus /> Add connection
+          </DropdownMenuItem>
+        )}
+
+        <DropdownMenuItem onClick={onReconnect}>
+          <Icons.Disconnect />
+          Reconnect
+        </DropdownMenuItem>
+        {!isLocalServer && (
+          <>
+            <DropdownMenuItem
+              onClick={onEdit}
+              onMouseEnter={handlePrefetchServer}
+              onFocus={handlePrefetchServer}
+            >
+              <Icons.Settings />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem variant="destructive" onClick={onRemove}>
+              <Icons.Trash />
+              Remove
+            </DropdownMenuItem>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
