@@ -1,4 +1,4 @@
-import { Elysia, t } from "elysia";
+import { Elysia } from "elysia";
 import { adapter } from "../adapter";
 import { setupPlugin } from "../plugins/setup.plugin";
 
@@ -11,17 +11,16 @@ export const initRouter = new Elysia({
   .use(setupPlugin)
   .post(
     "/",
-    ({ body, store: { databases } }) => {
-      return databases.add(body.databases);
+    async ({ store: { servers } }) => {
+      const res = await servers.initialize();
+      return res;
     },
     {
-      body: t.Object({
-        databases: t.Array(
-          t.Object({
-            name: t.String(),
-            uri: t.String(),
-          }),
-        ),
-      }),
+      requireToken: "read",
+      detail: {
+        summary: "Initialize server instance",
+        description:
+          "Queries remote instances of local-sql, establishes connections and fetches local and remote connections",
+      },
     },
   );

@@ -12,8 +12,10 @@ export default function Home() {
   const connection = useCurrentConnection();
 
   const isQueryEnabled = !!view && !!isInitialized && !!connection;
+
   const { data: tableData } = useTableData(
-    view?.database || "",
+    view?.serverId || "",
+    view?.databaseId || "",
     view?.table || "",
     isQueryEnabled,
   );

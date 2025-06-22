@@ -5,7 +5,7 @@ import { Icons } from "@local-sql/ui/components/icons";
 import { SubmitButton } from "@local-sql/ui/components/submit-button";
 
 export const ConnectionsInitButton = () => {
-  const { mutate, isPending } = query.database.useInitialize();
+  const { mutate, isPending } = query.server.useInitialize();
   if (process.env.NODE_ENV === "production") return null;
 
   return (

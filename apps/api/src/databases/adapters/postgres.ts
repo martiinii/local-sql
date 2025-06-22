@@ -5,21 +5,27 @@ import { DatabaseConnection } from "../database-connection";
 export class PostgresDatabaseConnection extends DatabaseConnection {
   private _db: Pool;
 
-  constructor(uri: string) {
-    super(uri);
+  constructor(name: string, uri: string) {
+    super(name, uri);
 
     this._db = new Pool({
-      connectionString: uri,
+      connectionString: this._uri,
     });
   }
 
   protected async _connect(): Promise<boolean> {
-    await this._db.connect();
-    return true;
+    if (this._db.ended || this._db.ending) {
+      this._db = new Pool({
+        connectionString: this._uri,
+      });
+    }
+    return true; // we are using pool, should be always connected. Using _db.connect() will create new (unused) client. pg manages own clients internally
   }
 
   protected async _disconnect(): Promise<void> {
-    await this._db.end();
+    if (!this._db.ended && this._db.ending) {
+      await this._db.end();
+    }
   }
 
   protected async _queryTables(): Promise<string[]> {

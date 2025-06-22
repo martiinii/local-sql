@@ -1,14 +1,16 @@
 import { swagger } from "@elysiajs/swagger";
+import { LOCAL_SERVER_ID } from "@local-sql/db-types";
 import chalk from "chalk";
 import { Elysia } from "elysia";
 import { adapter } from "./adapter";
+import { LOCAL_SERVER_PORT } from "./constants";
+import { migrateDatabase } from "./db/migrate-database";
 import { timeout } from "./lib/timeout-util";
 import { prettyLog } from "./plugins/pretty-log.plugin";
 import { setupPlugin } from "./plugins/setup.plugin";
-import { databaseRouter } from "./routers/database.router";
 import { initRouter } from "./routers/init.router";
-
-const PORT = 57597;
+import { serverRouter } from "./routers/server.router";
+import { tokenRouter } from "./routers/token.router";
 
 export const app = new Elysia({
   adapter: adapter,
@@ -20,20 +22,40 @@ export const app = new Elysia({
       documentation: {
         info: {
           title: "Local SQL Server API Documentation",
-          version: "1.0.0",
+          version: "",
         },
+        tags: [
+          {
+            name: "Initialize",
+            description: "Initialize endpoint",
+          },
+          {
+            name: "Server",
+            description: "Manage servers",
+          },
+        ],
+      },
+      scalarConfig: {
+        favicon: "/public/favicon.svg",
       },
     }),
   )
   .use(initRouter)
-  .use(databaseRouter)
-  .listen(PORT, ({ url }) => {
+  .use(serverRouter)
+  .use(tokenRouter);
+
+// Start listening on port
+const listen = async () => {
+  await migrateDatabase();
+  await app.store.servers.initialize();
+
+  app.listen(LOCAL_SERVER_PORT, async ({ url }) => {
     prettyLog(
-      `Local SQL Server is running at ${chalk.blue(`http://${url.hostname}:${PORT}`)}`,
+      `Local SQL Server is running at ${chalk.blue(`http://${url.hostname}:${LOCAL_SERVER_PORT}`)}`,
     );
   });
-
-export type App = typeof app;
+};
+listen();
 
 // Graceful shutdown
 let isShuttingDown = false;
@@ -42,9 +64,11 @@ const gracefulShutdown = async () => {
   if (isShuttingDown) return;
   isShuttingDown = true;
 
-  prettyLog(`Stopping Local SQL Server on port ${PORT}`);
+  prettyLog(`Stopping Local SQL Server on port ${LOCAL_SERVER_PORT}`);
 
-  const shutdownAppPromises = [app.store.databases.end()];
+  const shutdownAppPromises = [
+    app.store.servers.get(LOCAL_SERVER_ID)?.connections.disconnectAll(),
+  ];
 
   try {
     await timeout(
@@ -69,3 +93,5 @@ const gracefulShutdown = async () => {
 for (const signal of ["SIGINT", "SIGTERM", "SIGQUIT", "SIGHUP"]) {
   process.on(signal, gracefulShutdown);
 }
+
+export type App = typeof app;

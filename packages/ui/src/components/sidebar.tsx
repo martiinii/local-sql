@@ -430,6 +430,7 @@ function SidebarGroupAction({
         // Increases the hit area of the button on mobile.
         "after:absolute after:-inset-2 md:after:hidden",
         "group-data-[collapsible=icon]:hidden",
+        "disabled:pointer-events-none disabled:opacity-50",
         className,
       )}
       {...props}

@@ -1,71 +1,113 @@
 import { api } from "@/lib/api";
 import { useCreateMutation } from "@/lib/create-mutation";
 import { unwrapEdenQuery } from "@/lib/eden-query";
-import { useAppStore } from "@/store/app.store";
 import {
-  transformDatabaseConnectionResponse,
-  useConnectionStore,
-} from "@/store/connections.store";
-
-export const useInitialize = (hideToastError?: boolean) => {
-  const storeInitialize = useConnectionStore((state) => state.initialize);
-  const storeConnections = useConnectionStore((state) => state.connections);
-  const storeUpdateAppConnection = useAppStore((state) => state.setIsConnected);
-  const storeIncrementAttemptsCount = useAppStore(
-    (state) => state.incrementConnectionAttempts,
-  );
-
-  return useCreateMutation({
-    mutationFn: () =>
-      unwrapEdenQuery(api.init.post)({
-        databases: storeConnections.map((conn) => ({
-          name: conn.slug,
-          uri: conn.uri,
-        })),
-      }),
-    onSuccess: (data) => {
-      storeInitialize(data);
-      storeUpdateAppConnection(true);
-    },
-    onSettled: () => {
-      storeIncrementAttemptsCount();
-    },
-    onErrorShowToast: !hideToastError,
-  });
-};
+  transformDatabaseTablesResponse,
+  useServersStore,
+} from "@/store/servers.store";
 
 export const useConnectDatabase = () => {
-  const storeUpdateConnection = useConnectionStore(
-    (state) => state.updateConnectionDetails,
+  const storeUpdateConnection = useServersStore(
+    (state) => state.updateDatabaseData,
   );
 
   return useCreateMutation({
-    mutationFn: async (slug: string) => {
-      const { connectionStatus } = await unwrapEdenQuery(
-        api.db({ slug }).connect.post,
+    mutationFn: async ({
+      serverId,
+      databaseId,
+    }: { serverId: string; databaseId: string }) => {
+      const { isConnected, tables } = await unwrapEdenQuery(
+        api.server({ serverId }).database({ databaseId }).connect.post,
       )();
-      const tables = await unwrapEdenQuery(api.db({ slug }).tables.get)();
-      return { connectionStatus, tables };
+      return { connectionStatus: isConnected, tables };
     },
-    onSuccess: (data, slug) => {
-      const transformedTables = transformDatabaseConnectionResponse(
-        data.tables,
-      );
+    onSuccess: (data, { serverId, databaseId }) => {
+      const transformedTables = transformDatabaseTablesResponse(data.tables);
 
-      storeUpdateConnection(slug, {
+      storeUpdateConnection(serverId, databaseId, {
         ...transformedTables,
         connectionStatus: {
           value: data.connectionStatus ? "connected" : "disconnected",
         },
       });
     },
-    onError: (error, slug) => {
-      storeUpdateConnection(slug, {
+    onError: (error, { serverId, databaseId }) => {
+      storeUpdateConnection(serverId, databaseId, {
         connectionStatus: {
           value: "error",
           error: error.message,
         },
       });
+    },
+  });
+};
+
+export const useDisconnectDatabase = () => {
+  const storeUpdateConnection = useServersStore(
+    (state) => state.updateDatabaseData,
+  );
+
+  return useCreateMutation({
+    mutationFn: async ({
+      serverId,
+      databaseId,
+    }: { serverId: string; databaseId: string }) => {
+      const data = await unwrapEdenQuery(
+        api.server({ serverId }).database({ databaseId }).disconnect.post,
+      )();
+
+      return data;
+    },
+    onSuccess: (data, { serverId, databaseId }) => {
+      storeUpdateConnection(serverId, databaseId, {
+        connectionStatus: {
+          value: data.connectionStatus ? "connected" : "disconnected",
+        },
+      });
+    },
+  });
+};
+
+export const useDeleteDatabase = () => {
+  const storeDeleteConnection = useServersStore(
+    (state) => state.deleteDatabase,
+  );
+
+  return useCreateMutation({
+    mutationFn: async ({
+      serverId,
+      databaseId,
+    }: { serverId: string; databaseId: string }) => {
+      const data = await unwrapEdenQuery(
+        api.server({ serverId }).database({ databaseId }).delete,
+      )();
+
+      return data;
+    },
+    onSuccess: (_, { serverId, databaseId }) => {
+      storeDeleteConnection(serverId, databaseId);
+    },
+  });
+};
+
+export const useCreateDatabase = () => {
+  const storeSetDatabases = useServersStore((state) => state.updateServerData);
+  const storeUpdateServer = useServersStore((state) => state.updateServerData);
+
+  return useCreateMutation({
+    mutationFn: async ({
+      serverId,
+      ...data
+    }: { serverId: string; name: string; uri: string }) => {
+      return await unwrapEdenQuery(api.server({ serverId }).database.post)(
+        data,
+      );
+    },
+    onSuccess: (data, { serverId }) => {
+      storeSetDatabases(serverId, { connections: data.connections });
+    },
+    onError: (_, { serverId }) => {
+      storeUpdateServer(serverId, { isConnected: false });
     },
   });
 };
