@@ -3,6 +3,7 @@
 import { CreateConnectionDialog } from "@/features/connection/create-connection.dialog";
 import { ServerStatusIcon } from "@/features/connection/server-status-icon";
 import { UpdateServerDialog } from "@/features/server/update-server.dialog";
+import { ManageServerTokensDialog } from "@/features/token/manage-server-tokens.dialog";
 import { query } from "@/query";
 import type { Server } from "@/store/servers.store";
 import { LOCAL_SERVER_ID } from "@local-sql/db-types";
@@ -29,12 +30,14 @@ type ServerSidebarGroupProps = {
 export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
   const [isNewConnOpen, setIsNewConnOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+  const [isTokensOpen, setIsTokensOpen] = useState(false);
 
   // Server data
-  const { data: serverData, isLoading } = query.server.useServer({
-    id: server.id,
-    enabled: isUpdateOpen,
-  });
+  const { data: serverData, isPending: isPendingServer } =
+    query.server.useServer({
+      id: server.id,
+      enabled: isUpdateOpen,
+    });
 
   const handlePrefetchServer = () => {
     query.server.prefetchServer({ id: server.id });
@@ -55,6 +58,9 @@ export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
   const onReconnect = () => {
     connectServer(server.id);
   };
+  const onManageTokens = () => {
+    setIsTokensOpen(true);
+  };
   const onEdit = () => {
     setIsUpdateOpen(true);
   };
@@ -73,6 +79,7 @@ export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
         handlePrefetchServer={handlePrefetchServer}
         onAddConnection={onAddConnection}
         onReconnect={onReconnect}
+        onManageTokens={onManageTokens}
         onEdit={onEdit}
         onRemove={onRemove}
       >
@@ -96,12 +103,17 @@ export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
         serverId={server.id}
         isOpen={isUpdateOpen}
         setIsOpen={setIsUpdateOpen}
-        isLoading={isLoading}
+        isLoading={isPendingServer}
         defaultValues={{
           name: serverData?.name || "",
           url: serverData?.url || "",
           token: "",
         }}
+      />
+      <ManageServerTokensDialog
+        server={server}
+        isOpen={isTokensOpen}
+        setIsOpen={setIsTokensOpen}
       />
       <SidebarGroupContent>
         <SidebarMenu>
@@ -118,6 +130,7 @@ type ServerSidebarDropdownMenuProps = PropsWithChildren & {
   server: Server;
   onAddConnection: () => void;
   onReconnect: () => void;
+  onManageTokens: () => void;
   onEdit: () => void;
   handlePrefetchServer: () => void;
   onRemove: () => void;
@@ -127,6 +140,7 @@ const ServerSidebarDropdownMenu = ({
   server,
   onAddConnection,
   onReconnect,
+  onManageTokens,
   onEdit,
   handlePrefetchServer,
   onRemove,
@@ -148,6 +162,11 @@ const ServerSidebarDropdownMenu = ({
           <Icons.Disconnect />
           Reconnect
         </DropdownMenuItem>
+        {server.isConnected && !isReadOnly && (
+          <DropdownMenuItem onClick={onManageTokens}>
+            <Icons.Key /> Manage tokens
+          </DropdownMenuItem>
+        )}
         {!isLocalServer && (
           <>
             <DropdownMenuItem

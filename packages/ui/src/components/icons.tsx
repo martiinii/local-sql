@@ -1,9 +1,13 @@
 import {
+  ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Computer,
   Database,
   Ellipsis,
   Eye,
+  KeyRound,
   LifeBuoy,
   Loader2,
   MoonStar,
@@ -12,6 +16,7 @@ import {
   Send,
   Server,
   Settings,
+  Settings2,
   SquareTerminal,
   Sun,
   SunMoon,
@@ -35,7 +40,10 @@ export const Icons = {
   Wrench,
   SquareTerminal,
   Plus,
+  ChevronLeft,
+  ChevronsLeft,
   ChevronRight,
+  ChevronsRight,
   Table: TableProperties,
   Database,
   Server,
@@ -44,6 +52,8 @@ export const Icons = {
   Trash: Trash2,
   TriangleAlert,
   Eye,
+  Key: KeyRound,
+  Sliders: Settings2,
 };
 
 export type IconName = keyof typeof Icons;

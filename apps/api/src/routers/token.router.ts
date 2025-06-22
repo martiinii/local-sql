@@ -1,3 +1,4 @@
+import { LOCAL_SERVER_ID } from "@local-sql/db-types";
 import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 import { adapter } from "../adapter";
@@ -15,7 +16,7 @@ export const tokenRouter = new Elysia({
 })
   .use(setupPlugin)
   .get(
-    "/",
+    `/${LOCAL_SERVER_ID}`,
     async () => {
       const tokens = await db.query.accessToken.findMany();
 
@@ -29,8 +30,44 @@ export const tokenRouter = new Elysia({
       requireToken: "read",
     },
   )
+  .get(
+    "/:serverId",
+    async ({ params, store: { servers }, status }) => {
+      const server = servers.get(params.serverId);
+      if (!server) return status(404, "Server not found");
+
+      if (!server.isConnected) {
+        const connectResponse = await server.connect();
+        if (!connectResponse.isConnected)
+          return status(
+            503,
+            "An error occured while connecting to remote instance of local-sql server",
+          );
+      }
+
+      try {
+        const response = await server.gatewayApi.token.local.get();
+        if (response.error) {
+          return status(
+            Number(response.error.status) || 500,
+            response.error.value,
+          );
+        }
+
+        return response.data;
+      } catch {
+        return status(
+          503,
+          "An error occured while retrieving tokens from remote instance of local-sql server",
+        );
+      }
+    },
+    {
+      requireToken: "read",
+    },
+  )
   .post(
-    "/",
+    `/${LOCAL_SERVER_ID}`,
     async ({ body }) => {
       const [token] = await db
         .insert(accessToken)
@@ -49,8 +86,47 @@ export const tokenRouter = new Elysia({
       }),
     },
   )
+  .post(
+    "/:serverId",
+    async ({ params, body, store: { servers }, status }) => {
+      const server = servers.get(params.serverId);
+      if (!server) return status(404, "Server not found");
+
+      if (!server.isConnected) {
+        const connectResponse = await server.connect();
+        if (!connectResponse.isConnected)
+          return status(
+            503,
+            "An error occured while connecting to remote instance of local-sql server",
+          );
+      }
+
+      try {
+        const response = await server.gatewayApi.token.local.post(body);
+        if (response.error) {
+          return status(
+            Number(response.error.status) || 500,
+            response.error.value,
+          );
+        }
+
+        return response.data;
+      } catch {
+        return status(
+          503,
+          "An error occured while creating token on remote instance of local-sql server",
+        );
+      }
+    },
+    {
+      requireToken: "write",
+      body: t.Object({
+        permission: t.UnionEnum(["read", "write"]),
+      }),
+    },
+  )
   .put(
-    "/:id",
+    `/${LOCAL_SERVER_ID}/:id`,
     async ({ body, params }) => {
       await db
         .update(accessToken)
@@ -66,10 +142,89 @@ export const tokenRouter = new Elysia({
       }),
     },
   )
+  .put(
+    "/:serverId/:id",
+    async ({ body, params, store: { servers }, status }) => {
+      const server = servers.get(params.serverId);
+      if (!server) return status(404, "Server not found");
+
+      if (!server.isConnected) {
+        const connectResponse = await server.connect();
+        if (!connectResponse.isConnected)
+          return status(
+            503,
+            "An error occured while connecting to remote instance of local-sql server",
+          );
+      }
+
+      try {
+        const response = await server.gatewayApi.token
+          .local({ id: params.id })
+          .put(body);
+        if (response.error) {
+          return status(
+            Number(response.error.status) || 500,
+            response.error.value,
+          );
+        }
+
+        return response.data;
+      } catch {
+        return status(
+          503,
+          "An error occured while updating token on remote instance of local-sql server",
+        );
+      }
+    },
+    {
+      requireToken: "write",
+      body: t.Object({
+        permission: t.UnionEnum(["read", "write"]),
+      }),
+    },
+  )
   .delete(
-    "/:id",
+    `/${LOCAL_SERVER_ID}/:id`,
     async ({ params }) => {
       await db.delete(accessToken).where(eq(accessToken.id, params.id));
+    },
+    {
+      requireToken: "write",
+    },
+  )
+  .delete(
+    "/:serverId/:id",
+    async ({ params, store: { servers }, status }) => {
+      const server = servers.get(params.serverId);
+      if (!server) return status(404, "Server not found");
+
+      if (!server.isConnected) {
+        const connectResponse = await server.connect();
+        if (!connectResponse.isConnected)
+          return status(
+            503,
+            "An error occured while connecting to remote instance of local-sql server",
+          );
+      }
+
+      try {
+        const response = await server.gatewayApi.token
+          .local({ id: params.id })
+          .delete();
+        if (response.error) {
+          return status(
+            Number(response.error.status) || 500,
+            response.error.value,
+          );
+        }
+
+        return response.data;
+      } catch {
+        return status(
+          503,
+          "An error occured while deleting token on remote instance of local-sql server",
+        );
+      }
     },
     {
       requireToken: "write",
