@@ -5,7 +5,7 @@ import { db } from "../db";
 export const tokenMacro = new Elysia({
   name: "tokenMacro",
 })
-  .decorate("requireToken", false)
+  .decorate("requireToken", process.env.REQUIRE_TOKEN === "true")
   .use(bearer())
   .macro({
     requireToken: (permission: "read" | "write") => ({

@@ -2,7 +2,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { getAppDataPath } from "@local-sql/utils/get-appdata-path";
 
-export const DB_PATH = path.join(getAppDataPath(), "data.db");
+export const DB_PATH =
+  process.env.DB_PATH || path.join(getAppDataPath(), "data.db");
 export const DB_PATH_FILE = `file:${DB_PATH}`;
 
 let isDirectoryCreated = false;
