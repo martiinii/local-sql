@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "chalk": "^5.4.1",
-    "env-paths": "^3.0.0"
+    "env-paths": "^3.0.0",
+    "pretty-bytes": "^7.0.0"
   }
 }
