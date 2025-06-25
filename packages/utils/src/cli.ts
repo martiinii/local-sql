@@ -51,7 +51,7 @@ export const copyFiles = async ({
   const glob = new Bun.Glob(pattern);
   let fileCount = 0;
 
-  for await (const filePath of glob.scan(baseDir)) {
+  for await (const filePath of glob.scan({ cwd: baseDir, dot: true })) {
     fileCount++;
     const file = Bun.file(join(baseDir || "./", filePath));
 

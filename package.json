@@ -4,25 +4,26 @@
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "build": "turbo build",
-    "clean": "git clean -xdf node_modules",
-    "clean:workspaces": "turbo clean",
     "dev": "turbo dev --parallel",
     "format": "biome format --write .",
     "lint": "turbo lint && bun lint:repo",
     "lint:repo": "bunx sherif@latest",
     "lint:repo:fix": "bunx sherif@latest --fix",
-    "bump": "bumpp"
+    "bump": "bumpp",
+    "build": "turbo build",
+    "build:app": "turbo build --filter=@local-sql/app",
+    "build:api": "turbo build --filter=@local-sql/api",
+    "build:cli": "turbo build --filter=@local-sql/cli",
+    "clean": "git clean -xdf .turbo",
+    "clean:workspaces": "turbo clean"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@local-sql/typescript-config": "workspace:*",
+    "bumpp": "^10.1.1",
+    "tinyglobby": "^0.2.14",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },
-  "packageManager": "bun@1.2.15",
-  "dependencies": {
-    "bumpp": "^10.1.1",
-    "tinyglobby": "^0.2.14"
-  }
+  "packageManager": "bun@1.2.15"
 }

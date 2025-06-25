@@ -1,24 +1,18 @@
 {
-  "name": "local-sql",
+  "name": "@local-sql/cli",
   "description": "Manage PostgreSQL databases locally",
   "version": "1.0.2",
   "type": "module",
-  "bin": {
-    "local-sql": "./bin/local-sql.js",
-    "localsql": "./bin/local-sql.js"
-  },
+  "private": true,
   "scripts": {
-    "clean": " rm -rf bin/api/build bin/app/build",
-    "start:dev": "bun ./bin/local-sql.ts",
     "build": "bun run ./build.ts",
-    "build:ci": "bun run clean && bun run --cwd=../../ build --force && cp ../../README.md ./",
     "lint": "biome lint --write",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "clean": "git clean -xdf .turbo build"
   },
   "dependencies": {
     "chalk": "^5.4.1",
-    "commander": "^14.0.0",
-    "next": "^15.3.2"
+    "commander": "^14.0.0"
   },
   "devDependencies": {
     "@types/bun": "^1.2.14@"

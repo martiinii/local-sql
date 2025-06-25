@@ -1,4 +1,4 @@
-![Local SQL](assets/github.svg)
+![Local SQL](https://raw.githubusercontent.com/martiinii/local-sql/main/assets/github.svg)
 
 ---
 
@@ -18,10 +18,12 @@ Visit [localsql.dev](https://localsql.dev), add connection and start browsing yo
 
 - [x] Implement data fetching and data viewer
 - [ ] Inserting and updating data
-- [ ] Manage existing servers & connections
 - [ ] Implement pagination
+- [x] Manage existing servers & connections
 - [x] Explore different way to save connections (in browser local-storage vs server db with os app data directory)
-- [ ] Server key generation (for gateways), permissions
+- [x] Server key generation (for gateways), permissions
+- [x] Better building process and CLI
+- [ ] Docker image for API
 
 ## Get started
 

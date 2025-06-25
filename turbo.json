@@ -10,16 +10,7 @@
       "env": [],
       "inputs": ["$TURBO_DEFAULT$", ".env"],
       "dependsOn": ["^build"],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "next-env.d.ts",
-        ".expo/**",
-        "dist/server",
-        "$TURBO_ROOT$/packages/cli/bin/api/build/**",
-        "$TURBO_ROOT$/packages/cli/bin/app/build/**",
-        "local-sql.js"
-      ]
+      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts", "build/**"]
     },
     "start": {
       "cache": false
@@ -32,11 +23,10 @@
       "persistent": true,
       "cache": false
     },
-    "jobs": {
-      "persistent": true,
+    "lint": {
       "cache": false
     },
-    "lint": {
+    "clean": {
       "dependsOn": ["^topo"],
       "cache": false
     },

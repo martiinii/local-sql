@@ -8,7 +8,7 @@ import { createPrettyLogger } from "@local-sql/utils/pretty-log";
 import chalk from "chalk";
 import { program } from "commander";
 
-const logger = createPrettyLogger("LOCAL-SQL API");
+const logger = createPrettyLogger("LOCAL-SQL APP");
 const RUNTIME = detectRuntime();
 
 // Paths
@@ -23,50 +23,51 @@ program
   .name(packageJson.name)
   .version(packageJson.version)
   .description(packageJson.description)
-  .option("-p, --port <number>", "Specify API port number", (value) =>
+  .option("-p, --port <number>", "Specify APP port number", (value) =>
     Number.parseInt(value, 10),
   )
-  .option("--db-path <path>", "Path to the database file")
-  .option("--require-token", "Require authentication token for API access")
   .parse(process.argv);
 
-const options: { port?: number; dbPath?: string; requireToken?: boolean } =
-  program.opts();
+const options: { port?: number } = program.opts();
 
 // Helpers
 
 const main = async () => {
   logger(`Detected ${chalk.blue.bold(RUNTIME)} runtime`);
 
-  const elysiaProcess = spawn(
-    ...constructSpawnArgs(RUNTIME, false, ["./index.js"]),
+  const nextProcess = spawn(
+    ...constructSpawnArgs(RUNTIME, false, ["./server.js"]),
     {
       stdio: ["ignore", "pipe", "pipe"],
       env: {
         ...process.env,
         FORCE_COLOR: "1",
-        DB_PATH: options.dbPath,
-        REQUIRE_TOKEN: options.requireToken ? "true" : undefined,
-        PORT: options.port?.toString(),
+        PORT: options.port?.toString() || "7579",
+        HOSTNAME: "localhost", // TODO allow binding other address via options
       },
     },
   );
 
-  elysiaProcess.stdout.on("data", (data) => {
+  nextProcess.stdout.on("data", (data) => {
     const fullMessage = String(data);
-    const messageWithoutPrefix =
-      fullMessage.match(/^.*?\[API\][^\w]\[\d+m (.*)/)?.[1] || fullMessage;
 
-    logger(messageWithoutPrefix);
+    const lines = fullMessage.split("\n");
+
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      if (trimmedLine.length > 0) {
+        logger(trimmedLine);
+      }
+    }
   });
 
   // Read and modify stderr (warnings/errors)
-  elysiaProcess.stderr.on("data", (data) => {
+  nextProcess.stderr.on("data", (data) => {
     logger(`${chalk.red("[ERROR]")} ${data}`);
   });
 
   // Handle process exit
-  elysiaProcess.on("exit", (code) => {
+  nextProcess.on("exit", (code) => {
     if (code !== 0) {
       logger(chalk.red("❌ An error occurred while exiting the process"));
     }
@@ -74,9 +75,9 @@ const main = async () => {
 
   // Stop process
   const cleanup = () => {
-    logger("Stopping API...");
+    logger("Stopping app...");
 
-    elysiaProcess.kill("SIGTERM");
+    nextProcess.kill("SIGTERM");
     process.exit();
   };
 

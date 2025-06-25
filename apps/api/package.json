@@ -9,7 +9,8 @@
     "build": "bun ./build.ts",
     "start": "bun src/index.ts",
     "format": "biome format --write .",
-    "lint": "biome lint"
+    "lint": "biome lint",
+    "clean": "git clean -xdf .turbo build"
   },
   "dependencies": {
     "@elysiajs/bearer": "^1.3.0",
