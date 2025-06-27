@@ -81,6 +81,6 @@ jobs:
       - name: Publish ${{matrix.package}} to npm
         run: |
           cd ${{ matrix.package == 'cli' && 'packages/cli/build' || format('apps/{0}/build', matrix.package) }}
-          bun publish --verbose --tag ${{ steps.determine_npm_tag.outputs.npm_tag }}
+          bun publish --verbose --access public --tag ${{ steps.determine_npm_tag.outputs.npm_tag }}
         env:
           NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
