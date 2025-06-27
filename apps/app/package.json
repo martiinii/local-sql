@@ -1,7 +1,7 @@
 {
   "name": "@local-sql/app",
   "description": "Next.js App of Local SQL",
-  "version": "1.1.0-beta.2",
+  "version": "1.1.0-beta.3",
   "type": "module",
   "private": true,
   "scripts": {
