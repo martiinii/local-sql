@@ -18,7 +18,7 @@ export const constructSpawnArgs = (
         ? "npx"
         : "node";
   const constructedArgs = [
-    runtime === "bun" && isExecutable ? "--bun" : null,
+    isExecutable ? (runtime === "bun" ? "--bun" : "--yes") : null,
     ...args,
   ].filter(Boolean) as string[];
 
