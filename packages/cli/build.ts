@@ -1,23 +1,57 @@
+import { rm } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { prettyPrintBunBuildArtifact } from "@local-sql/utils/cli";
 import chalk from "chalk";
 
-const transpiler = new Bun.Transpiler({
-  loader: "ts",
-  target: "node",
-  minifyWhitespace: true,
-  deadCodeElimination: true,
-  tsconfig: {
-    compilerOptions: {
-      paths: {
-        "@/*": ["."],
-      },
-    },
-  },
+// Clean up previous build directory
+await rm("./build", {
+  recursive: true,
+  force: true,
 });
 
-const tsFile = await Bun.file("./bin/local-sql.ts").text();
-const jsTranspiled = transpiler.transformSync(tsFile);
+// Build the CLI
+const result = await Bun.build({
+  entrypoints: ["./src/cli.ts"],
+  outdir: "./build",
+  target: "node",
+  minify: {
+    syntax: true,
+    whitespace: true,
+  },
+  banner: "#!/usr/bin/env node",
+});
 
-const jsWithShebang = `#!/usr/bin/env node\n${jsTranspiled}`;
-await Bun.write("./bin/local-sql.js", jsWithShebang);
+for (const output of result.outputs) {
+  prettyPrintBunBuildArtifact(output);
+}
 
-console.log(chalk.green("Bin script build complete"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Create package.json and README for the build
+type PackageJson = Record<"description" | "version", string>;
+const packageJson: PackageJson = await Bun.file(
+  path.join(__dirname, "./package.json"),
+).json();
+
+const packageJsonBuild = {
+  name: "local-sql",
+  description: packageJson.description,
+  version: packageJson.version,
+  type: "module",
+  bin: {
+    "local-sql": "./cli.js",
+    localsql: "./cli.js",
+  },
+};
+
+const readmeFile = Bun.file(path.join(__dirname, "../../README.md"));
+
+await Bun.write(
+  "./build/package.json",
+  JSON.stringify(packageJsonBuild, null, 2),
+);
+await Bun.write("./build/README.md", readmeFile);
+
+console.log(chalk.green("\nCLI Build completed successfully"));

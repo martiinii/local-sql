@@ -1,18 +1,18 @@
 {
   "name": "@local-sql/app",
-  "version": "1.0.2",
+  "description": "Next.js App of Local SQL",
+  "version": "1.1.0-beta.5",
   "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev -p 7597 --turbo",
-    "build": "rm -rf .next  && next build",
-    "postbuild": "rm -rf ../../packages/cli/bin/app/build && rm -rf .next/cache && cp -r .next/static .next/standalone/apps/app/.next/ && bun run copy-to-cli",
-    "copy-to-cli": "cp -r .next/standalone/apps/app ../../packages/cli/bin/app/build && cp -r .next/standalone/node_modules ../../packages/cli/bin/app/build && cp ../../packages/cli/package.json ../../packages/cli/bin/app/build",
+    "build": "bun ./build.ts",
+    "build:next": "next build",
     "start": "next start",
-    "clean": "git clean -xdf .next .turbo node_modules",
     "typecheck": "tsc --noEmit",
     "format": "biome format --write .",
-    "lint": "biome lint"
+    "lint": "biome lint",
+    "clean": "git clean -xdf .next .turbo build"
   },
   "dependencies": {
     "@local-sql/db-types": "workspace:*",
@@ -21,6 +21,7 @@
     "@tanstack/react-query": "^5.80.5",
     "@tanstack/react-table": "^8.21.3",
     "arktype": "^2.1.20",
+    "commander": "^14.0.0",
     "next": "^15.3.3",
     "next-themes": "^0.4.6",
     "nuqs": "^2.4.3",
