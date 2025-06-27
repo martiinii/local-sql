@@ -35,6 +35,7 @@ jobs:
           path: ${{ matrix.package == 'cli' && 'packages/cli/build' || format('apps/{0}/build', matrix.package) }}
           retention-days: 1
           if-no-files-found: error
+          include-hidden-files: true
 
   publish:
     runs-on: ubuntu-latest
