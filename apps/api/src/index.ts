@@ -36,6 +36,9 @@ export const app = new Elysia({
 
     return file;
   })
+  .get("/", ({ redirect }) => {
+    return redirect("/swagger");
+  })
   .use(
     swagger({
       path: "/swagger",
