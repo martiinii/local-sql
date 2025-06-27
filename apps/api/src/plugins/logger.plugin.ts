@@ -50,10 +50,12 @@ const logExecution = (
 
   const path = new URL(request.url).pathname;
 
+  const nonErrorCodes = [301, 307];
+
   logger(
     `${request.method} ${path} ${pickColor(status)(status)} in ${executionTime}ms`,
   );
-  if (error) {
+  if (error && !nonErrorCodes.includes(status)) {
     logger(`${chalk.red(error)}`);
   }
 };
