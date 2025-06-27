@@ -36,7 +36,9 @@ const main = async () => {
   logger(`Detected ${chalk.blue.bold(RUNTIME)} runtime`);
 
   const nextProcess = spawn(
-    ...constructSpawnArgs(RUNTIME, false, ["./server.js"]),
+    ...constructSpawnArgs(RUNTIME, false, [
+      path.join(__dirname, "./server.js"),
+    ]),
     {
       stdio: ["ignore", "pipe", "pipe"],
       env: {

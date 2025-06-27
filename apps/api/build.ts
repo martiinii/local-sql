@@ -20,6 +20,9 @@ const result = await Bun.build({
     whitespace: true,
   },
   banner: "#!/usr/bin/env node",
+  define: {
+    "process.env.IS_BUNDLED": "true",
+  },
 });
 
 for (const output of result.outputs) {
@@ -30,10 +33,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Create package.json and README for the build
-type PackageJson = Record<"name" | "description" | "version", string>;
+type PackageJson = Record<"name" | "description" | "version", string> &
+  Record<"dependencies", Record<string, string>>;
 const packageJson: PackageJson = await Bun.file(
   path.join(__dirname, "./package.json"),
 ).json();
+
+const extractDependenciesNames = ["@libsql/client"];
+const extractedDependencies = extractDependenciesNames.reduce(
+  (acc, cur) => {
+    if (packageJson.dependencies[cur]) {
+      acc[cur] = packageJson.dependencies[cur];
+    }
+
+    return acc;
+  },
+  {} as Record<string, string>,
+);
 
 const packageJsonBuild = {
   name: packageJson.name,
@@ -43,6 +59,7 @@ const packageJsonBuild = {
   bin: {
     "@local-sql/api": "./cli.js",
   },
+  dependencies: extractedDependencies,
 };
 
 const readmeFile = Bun.file(path.join(__dirname, "./README.md"));
@@ -64,7 +81,7 @@ await copyFiles({
 // Copy migrations
 await copyFiles({
   pattern: "**/*",
-  outdir: "./build/src/db/migrations",
+  outdir: "./build/migrations",
   baseDir: "./src/db/migrations",
   msgName: "migrations",
 });
