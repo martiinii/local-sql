@@ -18,15 +18,26 @@ export default function Page() {
   const isAppInitialized = useAppStore((state) => state.isConnected);
   const connectionTries = useAppStore((state) => state.connectionAttempts);
 
-  const { mutate: initialize } = query.database.useInitialize(true);
+  const { mutate: initialize } = query.server.useInitialize(true);
 
   // Try to initialize connection every second
   useEffect(() => {
-    const interval = setInterval(initialize, 1e3);
-    initialize();
+    let timeoutId: NodeJS.Timeout;
+
+    const scheduleNext = () => {
+      timeoutId = setTimeout(() => {
+        initialize(undefined, {
+          onSettled: scheduleNext,
+        });
+      }, 1e3);
+    };
+
+    initialize(undefined, {
+      onSettled: scheduleNext,
+    });
 
     return () => {
-      clearInterval(interval);
+      clearTimeout(timeoutId);
     };
   }, [initialize]);
 

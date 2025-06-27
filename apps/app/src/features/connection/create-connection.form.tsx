@@ -1,7 +1,5 @@
 "use client";
-import { api } from "@/lib/api";
-import { unwrapEdenQuery } from "@/lib/eden-query";
-import { useConnectionStore } from "@/store/connections.store";
+import { query } from "@/query";
 import {
   type FormProps,
   handleFormSubmit,
@@ -9,7 +7,6 @@ import {
 } from "@local-sql/ui/components/form";
 import { Input } from "@local-sql/ui/components/input";
 import { ShadowBox } from "@local-sql/ui/components/shadow-box";
-import { toast } from "@local-sql/ui/components/sonner";
 import { SubmitButton } from "@local-sql/ui/components/submit-button";
 import { type } from "arktype";
 
@@ -19,16 +16,17 @@ const CreateConnectionSchema = type({
   uri: type("string.url").configure({ actual: "" }),
 });
 
+type CreateConnectionFormProps = FormProps & {
+  serverId: string;
+};
 export const CreateConnectionForm = ({
+  serverId,
   className,
   noShadow,
   onSuccess,
   onError,
-}: FormProps) => {
-  const addConnection = useConnectionStore((state) => state.addConnection);
-  const initializeSingleConnection = useConnectionStore(
-    (state) => state.initializeSingleConnection,
-  );
+}: CreateConnectionFormProps) => {
+  const { mutateAsync: createConnection } = query.database.useCreateDatabase();
 
   const form = useForm({
     validators: {
@@ -39,23 +37,16 @@ export const CreateConnectionForm = ({
       uri: "",
     },
     onSubmit: async ({ value }) => {
-      try {
-        const slug = addConnection(value);
-        const [initializedDb] = await unwrapEdenQuery(api.init.post)({
-          databases: [
-            {
-              name: slug,
-              uri: value.uri,
-            },
-          ],
-        });
-        initializeSingleConnection(slug, initializedDb);
-
-        onSuccess?.();
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : "Unknown error occured");
-        onError?.();
-      }
+      await createConnection(
+        {
+          serverId,
+          ...value,
+        },
+        {
+          onSuccess,
+          onError,
+        },
+      );
     },
   });
   return (
@@ -66,7 +57,7 @@ export const CreateConnectionForm = ({
             <form.AppField name="name">
               {(field) => (
                 <field.FormItem>
-                  <field.FormLabel>Connection name (unique)</field.FormLabel>
+                  <field.FormLabel>Database name</field.FormLabel>
                   <field.FormControl>
                     <Input field={field} />
                   </field.FormControl>
@@ -78,7 +69,7 @@ export const CreateConnectionForm = ({
             <form.AppField name="uri">
               {(field) => (
                 <field.FormItem>
-                  <field.FormLabel>Connection URI</field.FormLabel>
+                  <field.FormLabel>Database URI</field.FormLabel>
                   <field.FormControl>
                     <Input
                       placeholder="postgresql://..."
@@ -94,7 +85,7 @@ export const CreateConnectionForm = ({
           </div>
 
           <SubmitButton isSubmitting={form.state.isSubmitting}>
-            Save connection
+            Save database
           </SubmitButton>
         </ShadowBox>
       </form>
