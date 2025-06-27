@@ -45,7 +45,7 @@ const main = async () => {
   logger(`Detected ${chalk.blue.bold(RUNTIME)} runtime`);
 
   if (!options.api && !options.ui) {
-    logger(chalk.red("You must run at least one process, api or app"));
+    logger(chalk.red("You must run at least one process, API or APP"));
     return process.exit(1);
   }
 
@@ -62,15 +62,22 @@ const main = async () => {
         Stream.Readable,
         Stream.Readable
       >;
+      nonVerboseLogs: string[];
     }
   >();
 
   if (options.api) {
-    processes.set("api", { package: `@local-sql/api${versionTag}` });
+    processes.set("api", {
+      package: `@local-sql/api${versionTag}`,
+      nonVerboseLogs: ["Local SQL Server is running at"],
+    });
   }
 
   if (options.ui) {
-    processes.set("app", { package: `@local-sql/app${versionTag}` });
+    processes.set("app", {
+      package: `@local-sql/app${versionTag}`,
+      nonVerboseLogs: ["- Local:"],
+    });
   }
 
   await Promise.all(
@@ -79,6 +86,7 @@ const main = async () => {
 
   logger(chalk.green("Dependencies installed!"));
 
+  // Sprawn API
   if (processes.has("api")) {
     const apiProcessObj = processes.get("api")!;
 
@@ -96,6 +104,7 @@ const main = async () => {
     processes.set("api", { ...apiProcessObj, spawnedProcess: apiProcess });
   }
 
+  // Spawn APP
   if (processes.has("app")) {
     const appProcessObj = processes.get("app")!;
 
@@ -122,15 +131,16 @@ const main = async () => {
     processes.set("app", { ...appProcessObj, spawnedProcess: appProcess });
   }
 
-  for (const [name, { spawnedProcess }] of processes.entries()) {
+  for (const [
+    name,
+    { spawnedProcess, nonVerboseLogs },
+  ] of processes.entries()) {
     if (!spawnedProcess) return;
 
     const verboseColor = name === "api" ? chalk.yellow : chalk.cyan;
     const processTag = verboseColor(`[${name.toUpperCase()}]`);
 
     spawnedProcess.stdout.on("data", (data) => {
-      if (!options.verbose) return;
-
       const fullMessage = String(data);
 
       const lines = fullMessage.split("\n");
@@ -142,7 +152,12 @@ const main = async () => {
             trimmedLine.match(/^.*?\[.*?\][^\w]\[\d+m (.*)/m)?.[1] ||
             trimmedLine;
 
-          logger(`${processTag} ${messageWithoutPrefix}`);
+          if (
+            options.verbose ||
+            nonVerboseLogs.some((part) => messageWithoutPrefix.startsWith(part))
+          ) {
+            logger(`${processTag} ${messageWithoutPrefix}`);
+          }
         }
       }
     });
