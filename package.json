@@ -15,7 +15,8 @@
     "build:api": "turbo build --filter=@local-sql/api",
     "build:cli": "turbo build --filter=@local-sql/cli",
     "clean": "git clean -xdf .turbo",
-    "clean:workspaces": "turbo clean"
+    "clean:workspaces": "turbo clean",
+    "publish:ci": "bun"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
