@@ -23,7 +23,7 @@ Visit [localsql.dev](https://localsql.dev), add connection and start browsing yo
 - [x] Explore different way to save connections (in browser local-storage vs server db with os app data directory)
 - [x] Server key generation (for gateways), permissions
 - [x] Better building process and CLI
-- [ ] Docker image for API
+- [x] Docker image for API
 
 ## Get started
 
