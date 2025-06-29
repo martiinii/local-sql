@@ -16,6 +16,8 @@ RUN bun install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
 RUN bun run build:api:docker
 
+# Fix for "Cannot find module '@libsql/linux-x64-gnu'" https://github.com/oven-sh/bun/issues/18909
+# It install libsql and its dependencies which then are copied by runner alongside compiled server
 FROM base AS libsql-installer
 WORKDIR /app
 

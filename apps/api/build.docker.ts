@@ -15,7 +15,7 @@ await Bun.$`FORCE_COLOR=1 bun build ./src/index.ts --compile --external "@libsql
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Create package.json and README for the build
+// Create package.json that contains @libsql/client as dependency. It will be used to create node_modules and copy them alongside compiled server https://github.com/oven-sh/bun/issues/18909
 type PackageJson = Record<"name" | "description" | "version", string> &
   Record<"dependencies", Record<string, string>>;
 const packageJson: PackageJson = await Bun.file(
