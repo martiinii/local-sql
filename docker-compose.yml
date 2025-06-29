@@ -1,0 +1,15 @@
+services:
+  api:
+    container_name: local-sql-api
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+    restart: always
+    volumes:
+      - dbdata:/app/db
+    # environment:
+    #   REQUIRE_TOKEN: "true"
+    ports:
+      - 57597:57597
+volumes:
+  dbdata:

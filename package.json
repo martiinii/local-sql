@@ -11,9 +11,11 @@
     "lint:repo:fix": "bunx sherif@latest --fix",
     "bump": "bumpp",
     "build": "turbo build",
+    "build:docker": "turbo build:docker",
     "build:app": "turbo build --filter=@local-sql/app",
     "build:api": "turbo build --filter=@local-sql/api",
     "build:cli": "turbo build --filter=@local-sql/cli",
+    "build:api:docker": "turbo build:docker --filter=@local-sql/api",
     "clean": "git clean -xdf .turbo",
     "clean:workspaces": "turbo clean",
     "publish:ci": "bun"

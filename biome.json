@@ -7,7 +7,14 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["node_modules", ".next", "api/build", "app/build", "cli/build"]
+    "ignore": [
+      "node_modules",
+      ".next",
+      ".turbo",
+      "build",
+      "build-docker",
+      "out"
+    ]
   },
   "formatter": {
     "enabled": true,

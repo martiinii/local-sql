@@ -15,6 +15,7 @@ next-env.d.ts
 
 # production
 build
+build-docker
 
 # misc
 .DS_Store
@@ -40,5 +41,3 @@ yarn-error.log*
 .turbo
 
 .npmrc
-local-sql.js
-packages/cli/README.md

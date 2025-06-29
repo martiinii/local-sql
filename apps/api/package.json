@@ -7,10 +7,11 @@
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "build": "bun ./build.ts",
+    "build:docker": "bun ./build.docker.ts",
     "start": "bun src/index.ts",
     "format": "biome format --write .",
     "lint": "biome lint",
-    "clean": "git clean -xdf .turbo build"
+    "clean": "git clean -xdf .turbo build build-docker"
   },
   "dependencies": {
     "@elysiajs/bearer": "^1.3.0",

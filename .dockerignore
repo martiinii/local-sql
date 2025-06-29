@@ -1,0 +1,13 @@
+Dockerfile
+.dockerignore
+.git
+.github
+assets
+.vscode
+.env
+
+**/.turbo
+**/build
+**/build-docker
+**/node_modules
+**/.next
