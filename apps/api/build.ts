@@ -1,7 +1,7 @@
 import { rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { copyFiles, prettyPrintBunBuildArtifact } from "@local-sql/utils/cli";
+import { prettyPrintBunBuildArtifact } from "@local-sql/utils/cli";
 import chalk from "chalk";
 
 // Clean up previous build directory
@@ -69,21 +69,5 @@ await Bun.write(
   JSON.stringify(packageJsonBuild, null, 2),
 );
 await Bun.write("./build/README.md", readmeFile);
-
-// Copy public assets
-await copyFiles({
-  pattern: "**/*",
-  outdir: "./build/public",
-  baseDir: "./public",
-  msgName: "public",
-});
-
-// Copy migrations
-await copyFiles({
-  pattern: "**/*",
-  outdir: "./build/migrations",
-  baseDir: "./src/db/migrations",
-  msgName: "migrations",
-});
 
 console.log(chalk.green("\nAPI Build completed successfully"));

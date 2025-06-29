@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "@local-sql/api/*": ["./src/*"]
-    }
+    },
+    "typeRoots": ["src/@types"]
   },
   "include": ["."],
   "exclude": ["node_modules"]
