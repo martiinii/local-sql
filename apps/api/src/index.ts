@@ -1,9 +1,9 @@
 import { readFile } from "node:fs/promises";
+import favicon from "@/../public/favicon.svg" with { type: "file" };
 import { swagger } from "@elysiajs/swagger";
 import { LOCAL_SERVER_ID } from "@local-sql/db-types";
 import chalk from "chalk";
 import { Elysia } from "elysia";
-import favicon from "../public/favicon.svg" with { type: "file" };
 import { adapter } from "./adapter";
 import { LOCAL_SERVER_PORT } from "./constants";
 import { migrateDatabase } from "./db/migrate-database";

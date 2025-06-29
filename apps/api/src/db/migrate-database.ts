@@ -6,13 +6,18 @@ import { db } from ".";
 
 // TODO in the future create script that automatically generates TS file with those imports
 // Import migrations so they can be bundled by Bun
-import longBeyonder0000 from "./migrations/0000_long_beyonder.sql" with {
+// @ts-ignore
+import longBeyonder0000 from "@/db/migrations/0000_long_beyonder.sql" with {
   type: "file",
 };
-import snapshot0000 from "./migrations/meta/0000_snapshot.json" with {
+// @ts-ignore
+import snapshot0000 from "@/db/migrations/meta/0000_snapshot.json" with {
   type: "file",
 };
-import journalData from "./migrations/meta/_journal.json" with { type: "file" };
+// @ts-ignore
+import journalData from "@/db/migrations/meta/_journal.json" with {
+  type: "file",
+};
 
 const MIGRATIONS_TEMP_PATH = path.join(getTempPath(), "migrations");
 
