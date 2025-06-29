@@ -15,7 +15,10 @@ export const useConnectDatabase = () => {
     mutationFn: async ({
       serverId,
       databaseId,
-    }: { serverId: string; databaseId: string }) => {
+    }: {
+      serverId: string;
+      databaseId: string;
+    }) => {
       const { isConnected, tables } = await unwrapEdenQuery(
         api.server({ serverId }).database({ databaseId }).connect.post,
       )();
@@ -51,7 +54,10 @@ export const useDisconnectDatabase = () => {
     mutationFn: async ({
       serverId,
       databaseId,
-    }: { serverId: string; databaseId: string }) => {
+    }: {
+      serverId: string;
+      databaseId: string;
+    }) => {
       const data = await unwrapEdenQuery(
         api.server({ serverId }).database({ databaseId }).disconnect.post,
       )();
@@ -77,7 +83,10 @@ export const useDeleteDatabase = () => {
     mutationFn: async ({
       serverId,
       databaseId,
-    }: { serverId: string; databaseId: string }) => {
+    }: {
+      serverId: string;
+      databaseId: string;
+    }) => {
       const data = await unwrapEdenQuery(
         api.server({ serverId }).database({ databaseId }).delete,
       )();
@@ -98,7 +107,11 @@ export const useCreateDatabase = () => {
     mutationFn: async ({
       serverId,
       ...data
-    }: { serverId: string; name: string; uri: string }) => {
+    }: {
+      serverId: string;
+      name: string;
+      uri: string;
+    }) => {
       return await unwrapEdenQuery(api.server({ serverId }).database.post)(
         data,
       );

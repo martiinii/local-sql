@@ -2,5 +2,7 @@
   "name": "@local-sql/typescript-config",
   "version": "1.1.0",
   "private": true,
-  "files": ["base.json"]
+  "files": [
+    "base.json"
+  ]
 }

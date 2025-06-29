@@ -1,10 +1,5 @@
 "use client";
 
-import { type VariantProps, cva } from "class-variance-authority";
-import { PanelLeftIcon } from "lucide-react";
-import { Slot } from "radix-ui";
-import * as React from "react";
-
 import { Button } from "@local-sql/ui/components/button";
 import { Input } from "@local-sql/ui/components/input";
 import { Separator } from "@local-sql/ui/components/separator";
@@ -24,6 +19,10 @@ import {
 } from "@local-sql/ui/components/tooltip";
 import { useIsMobile } from "@local-sql/ui/hooks/use-mobile";
 import { cn } from "@local-sql/ui/lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
+import { PanelLeftIcon } from "lucide-react";
+import { Slot } from "radix-ui";
+import * as React from "react";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -83,6 +82,7 @@ function SidebarProvider({
       }
 
       // This sets the cookie to keep the sidebar state.
+      // biome-ignore lint/suspicious/noDocumentCookie: Default shadcn component
       document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
     },
     [setOpenProp, open],

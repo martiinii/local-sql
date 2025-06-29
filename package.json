@@ -2,7 +2,10 @@
   "name": "local-sql",
   "version": "1.1.0",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "turbo dev --parallel",
     "format": "biome format --write .",
@@ -21,7 +24,7 @@
     "publish:ci": "bun"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.0.6",
     "@local-sql/typescript-config": "workspace:*",
     "bumpp": "^10.1.1",
     "tinyglobby": "^0.2.14",
