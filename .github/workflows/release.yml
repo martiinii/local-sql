@@ -195,8 +195,7 @@ jobs:
         run: bun add --global vercel@latest
 
       - name: Deploy app to Vercel
-        run: vercel deploy ${{ needs.determine_tag.outputs.npm_tag == 'latest' && '--prod' || '' }}
+        run: vercel deploy ${{ needs.determine_tag.outputs.npm_tag == 'latest' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
