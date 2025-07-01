@@ -67,13 +67,7 @@ export const useUpdateToken = () => {
 
 export const useDeleteToken = () => {
   return useCreateMutation({
-    mutationFn: async ({
-      serverId,
-      id,
-    }: {
-      serverId: string;
-      id: string;
-    }) => {
+    mutationFn: async ({ serverId, id }: { serverId: string; id: string }) => {
       return await unwrapEdenQuery(api.token({ serverId })({ id }).delete)();
     },
   });

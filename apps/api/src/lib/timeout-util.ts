@@ -11,7 +11,7 @@ export const timeout = <T>(
   timeoutMessage = `Operation timeout out after ${ms}ms`,
 ): Promise<T> => {
   return new Promise((resolve, reject) => {
-    let timerId: NodeJS.Timeout | undefined = undefined;
+    let timerId: NodeJS.Timeout | undefined;
     timerId = setTimeout(() => {
       timerId = undefined;
       reject(new TimeoutError(timeoutMessage));

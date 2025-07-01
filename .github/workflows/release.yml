@@ -7,58 +7,26 @@ on:
 
 permissions:
   contents: write
+  packages: write
+  attestations: write
+  id-token: write
 
 jobs:
-  build:
+  determine_tag:
     runs-on: ubuntu-latest
-    env:
-      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      TURBO_TEAM: ${{ vars.TURBO_TEAM }} 
-    strategy:
-      fail-fast: true
-      matrix:
-        package: ["app", "api", "cli"]
+    outputs:
+      npm_tag: ${{ steps.determine_npm_tag.outputs.npm_tag }}
+      version: ${{ steps.extract_version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Bun.js
-        uses: oven-sh/setup-bun@v2
-
-      - name: Install dependencies
-        run: bun i
-
-      - name: Build ${{matrix.package}}
-        run: bun run build:${{matrix.package}}
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-${{matrix.package}}
-          path: ${{ matrix.package == 'cli' && 'packages/cli/build' || format('apps/{0}/build', matrix.package) }}
-          retention-days: 1
-          if-no-files-found: error
-          include-hidden-files: true
-
-  publish:
-    runs-on: ubuntu-latest
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        package: [app, api, cli]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Bun.js
-        uses: oven-sh/setup-bun@v2
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-${{matrix.package}}
-          path: ${{ matrix.package == 'cli' && 'packages/cli/build' || format('apps/{0}/build', matrix.package) }}
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
 
       - name: Determine npm tag
         id: determine_npm_tag
@@ -82,9 +50,157 @@ jobs:
           echo "npm_tag=$NPM_TAG" >> $GITHUB_OUTPUT
           echo "Using npm tag: $NPM_TAG"
 
-      - name: Publish ${{matrix.package}} to npm
+  build:
+    runs-on: ubuntu-latest
+    needs: determine_tag
+    env:
+      TURBO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }} 
+    strategy:
+      fail-fast: true
+      matrix:
+        package: ["app", "api", "cli"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun.js
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun i
+
+      - name: Build ${{ matrix.package }}
+        run: bun run build:${{ matrix.package }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.package }}
+          path: ${{ matrix.package == 'cli' && 'packages/cli/build' || format('apps/{0}/build', matrix.package) }}
+          retention-days: 1
+          if-no-files-found: error
+          include-hidden-files: true
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [determine_tag, build]
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [app, api, cli]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun.js
+        uses: oven-sh/setup-bun@v2
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ matrix.package }}
+          path: ${{ matrix.package == 'cli' && 'packages/cli/build' || format('apps/{0}/build', matrix.package) }}
+
+      - name: Publish ${{ matrix.package }} to npm
         run: |
           cd ${{ matrix.package == 'cli' && 'packages/cli/build' || format('apps/{0}/build', matrix.package) }}
-          bun publish --verbose --access public --tag ${{ steps.determine_npm_tag.outputs.npm_tag }}
+          bun publish --verbose --access public --tag ${{ needs.determine_tag.outputs.npm_tag }}
         env:
           NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
+  
+  docker_publish:
+    runs-on: ubuntu-latest
+    needs: [determine_tag, build]
+
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract metadata for Docker
+        id: docker-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.IMAGE_NAME }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+          tags: |
+            # Exact version tag (work for both stable and pre-release)
+            type=semver,pattern={{version}},value=${{ needs.determine_tag.outputs.version }}
+
+            # Floating tags only for stable releases
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.determine_tag.outputs.version }},enable=${{ needs.determine_tag.outputs.npm_tag == 'latest' }}
+            type=semver,pattern={{major}},value=${{ needs.determine_tag.outputs.version }},enable=${{ needs.determine_tag.outputs.npm_tag == 'latest' }}
+
+            # npm tag (latest, beta, etc.)
+            type=raw,value=${{ needs.determine_tag.outputs.npm_tag }}
+
+      - name: Log in to the ${{ env.REGISTRY }} registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        id: docker-push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          push: true
+          tags: ${{ steps.docker-meta.outputs.tags }}
+          labels: ${{ steps.docker-meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.docker-push.outputs.digest }}
+          push-to-registry: true
+
+      - uses: meeDamian/sync-readme@v1.0.6
+        with:
+            user: ${{ vars.DOCKERHUB_USERNAME }}
+            pass: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  vercel_deploy:
+    runs-on: ubuntu-latest
+    needs: [determine_tag, publish]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun.js
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Vercel CLI
+        run: bun add --global vercel@latest
+
+      - name: Deploy app to Vercel
+        run: vercel deploy ${{ needs.determine_tag.outputs.npm_tag == 'latest' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

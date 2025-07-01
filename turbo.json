@@ -12,6 +12,12 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts", "build/**"]
     },
+    "build:docker": {
+      "env": [],
+      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "dependsOn": ["^build:docker"],
+      "outputs": ["build-docker/**"]
+    },
     "start": {
       "cache": false
     },

@@ -3,8 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@local-sql/api/*": ["./src/*"]
-    }
+      "@/*": ["./src/*"]
+    },
+    "typeRoots": ["src/@types"]
   },
   "include": ["."],
   "exclude": ["node_modules"]

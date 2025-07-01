@@ -4,7 +4,10 @@ import { cn } from "@local-sql/ui/lib/utils";
 export const ConnectionStatus = ({
   connectionStatus,
   className,
-}: { connectionStatus: DBConnectionStatus; className?: string }) => {
+}: {
+  connectionStatus: DBConnectionStatus;
+  className?: string;
+}) => {
   const srOnlyText =
     connectionStatus.value === "error"
       ? connectionStatus.error

@@ -110,7 +110,7 @@ export abstract class DatabaseConnection {
     try {
       const schema = await this._queryTableSchema(table);
       return schema;
-    } catch (e) {
+    } catch {
       return [];
     }
   }

@@ -1,38 +1,21 @@
 import { rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { copyFiles, prettyPrintBunBuildArtifact } from "@local-sql/utils/cli";
 import chalk from "chalk";
 
 // Clean up previous build directory
-await rm("./build", {
+await rm("./build-docker", {
   recursive: true,
   force: true,
 });
 
 // Build the API
-const result = await Bun.build({
-  entrypoints: ["./src/index.ts", "./src/cli.ts"],
-  outdir: "./build",
-  target: "node",
-  minify: {
-    syntax: true,
-    whitespace: true,
-  },
-  banner: "#!/usr/bin/env node",
-  define: {
-    "process.env.IS_BUNDLED": "true",
-  },
-});
-
-for (const output of result.outputs) {
-  prettyPrintBunBuildArtifact(output);
-}
+await Bun.$`FORCE_COLOR=1 bun build ./src/index.ts --compile --external "@libsql/*" --external libsql --minify-whitespace --minify-syntax --target bun --outfile ./build-docker/server --define 'process.env.IS_BUNDLED=true'`;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Create package.json and README for the build
+// Create package.json that contains @libsql/client as dependency. It will be used to create node_modules and copy them alongside compiled server https://github.com/oven-sh/bun/issues/18909
 type PackageJson = Record<"name" | "description" | "version", string> &
   Record<"dependencies", Record<string, string>>;
 const packageJson: PackageJson = await Bun.file(
@@ -63,14 +46,7 @@ const packageJsonBuild = {
 };
 
 await Bun.write(
-  "./build/package.json",
+  "./build-docker/package.json",
   JSON.stringify(packageJsonBuild, null, 2),
 );
-await copyFiles({
-  pattern: "README.md",
-  outdir: "./build",
-  baseDir: "./",
-  msgName: "README",
-});
-
-console.log(chalk.green("\nAPI Build completed successfully"));
+console.log(chalk.green("\nAPI Docker Build completed successfully"));

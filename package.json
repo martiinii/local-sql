@@ -1,8 +1,11 @@
 {
   "name": "local-sql",
-  "version": "1.1.0",
+  "version": "1.1.1-beta.3",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "turbo dev --parallel",
     "format": "biome format --write .",
@@ -11,20 +14,22 @@
     "lint:repo:fix": "bunx sherif@latest --fix",
     "bump": "bumpp",
     "build": "turbo build",
+    "build:docker": "turbo build:docker",
     "build:app": "turbo build --filter=@local-sql/app",
     "build:api": "turbo build --filter=@local-sql/api",
     "build:cli": "turbo build --filter=@local-sql/cli",
+    "build:api:docker": "turbo build:docker --filter=@local-sql/api",
     "clean": "git clean -xdf .turbo",
     "clean:workspaces": "turbo clean",
     "publish:ci": "bun"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.0.6",
     "@local-sql/typescript-config": "workspace:*",
     "bumpp": "^10.1.1",
     "tinyglobby": "^0.2.14",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },
-  "packageManager": "bun@1.2.15"
+  "packageManager": "bun@1.2.17"
 }

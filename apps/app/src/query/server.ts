@@ -91,7 +91,12 @@ export const useUpdateServer = () => {
     mutationFn: async ({
       serverId,
       ...data
-    }: { serverId: string; name: string; url: string; token?: string }) => {
+    }: {
+      serverId: string;
+      name: string;
+      url: string;
+      token?: string;
+    }) => {
       return await unwrapEdenQuery(api.server({ serverId }).put)(data);
     },
     onSuccess: ({ id, ...data }) => {
