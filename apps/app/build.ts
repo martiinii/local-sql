@@ -67,18 +67,22 @@ const packageJsonBuild = {
   dependencies: extractedDependencies,
 };
 
-const readmeFile = Bun.file(path.join(__dirname, "./README.md"));
-
 await Bun.write(
   "./build/package.json",
   JSON.stringify(packageJsonBuild, null, 2),
 );
-await Bun.write("./build/README.md", readmeFile);
 
 // Remove cache dir
 await rm("./.next/cache", {
   recursive: true,
   force: true,
+});
+
+await copyFiles({
+  pattern: "README.md",
+  outdir: "./build",
+  baseDir: "./",
+  msgName: "README",
 });
 
 // Copy static assets to standalone app https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files

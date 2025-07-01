@@ -1,7 +1,7 @@
 import { rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { prettyPrintBunBuildArtifact } from "@local-sql/utils/cli";
+import { copyFiles, prettyPrintBunBuildArtifact } from "@local-sql/utils/cli";
 import chalk from "chalk";
 
 // Clean up previous build directory
@@ -46,12 +46,15 @@ const packageJsonBuild = {
   },
 };
 
-const readmeFile = Bun.file(path.join(__dirname, "../../README.md"));
-
 await Bun.write(
   "./build/package.json",
   JSON.stringify(packageJsonBuild, null, 2),
 );
-await Bun.write("./build/README.md", readmeFile);
+await copyFiles({
+  pattern: "README.md",
+  outdir: "./build",
+  baseDir: "../../",
+  msgName: "README",
+});
 
 console.log(chalk.green("\nCLI Build completed successfully"));
