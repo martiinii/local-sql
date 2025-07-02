@@ -1,9 +1,8 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { getTempPath } from "@local-sql/utils/get-appdata-path";
 import { migrate } from "drizzle-orm/libsql/migrator";
-import { db } from ".";
-
 // TODO in the future create script that automatically generates TS file with those imports
 // Import migrations so they can be bundled by Bun
 // @ts-ignore
@@ -11,13 +10,18 @@ import longBeyonder0000 from "@/db/migrations/0000_long_beyonder.sql" with {
   type: "file",
 };
 // @ts-ignore
-import snapshot0000 from "@/db/migrations/meta/0000_snapshot.json" with {
-  type: "file",
-};
-// @ts-ignore
 import journalData from "@/db/migrations/meta/_journal.json" with {
   type: "file",
 };
+// @ts-ignore
+import snapshot0000 from "@/db/migrations/meta/0000_snapshot.json" with {
+  type: "file",
+};
+import { IS_BUNDLED } from "@/lib/is-bundled";
+import { db } from ".";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const MIGRATIONS_TEMP_PATH = path.join(getTempPath(), "migrations");
 
@@ -34,7 +38,9 @@ const saveMigrationsToTemp = async () => {
     Object.entries(files).map(async ([filePath, bundledFilePath]) => {
       await writeFile(
         path.join(MIGRATIONS_TEMP_PATH, filePath),
-        await readFile(bundledFilePath),
+        await readFile(
+          IS_BUNDLED ? path.join(__dirname, bundledFilePath) : bundledFilePath,
+        ),
       );
     }),
   );
