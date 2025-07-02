@@ -1,7 +1,7 @@
 {
   "name": "@local-sql/api",
   "description": "API of Local SQL",
-  "version": "1.1.1-beta.3",
+  "version": "1.1.1-beta.4",
   "type": "module",
   "private": true,
   "scripts": {
