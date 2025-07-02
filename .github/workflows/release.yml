@@ -71,7 +71,7 @@ jobs:
         run: bun i
 
       - name: Build ${{ matrix.package }}
-        run: bun run build:${{ matrix.package }}
+        run: VERCEL_TARGET_ENV=${{ needs.determine_tag.outputs.npm_tag == 'latest' && 'production' || 'preview' }} bun run build:${{ matrix.package }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
