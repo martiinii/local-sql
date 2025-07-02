@@ -7,7 +7,8 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "build/**"]
+      "outputs": [".next/**", "!.next/cache/**", "build/**"],
+      "inputs": ["$TURBO_DEFAULT$", "!.next/**"]
     },
     "build:docker": {
       "dependsOn": ["^build:docker"],
