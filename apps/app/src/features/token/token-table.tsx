@@ -1,7 +1,5 @@
 "use client";
 
-import { DataTable } from "@/components/table/data-table";
-import { type InferQueryApiType, query } from "@/query";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +10,8 @@ import {
 import { Icons } from "@local-sql/ui/components/icons";
 import { SubmitButton } from "@local-sql/ui/components/submit-button";
 import type { ColumnDef } from "@tanstack/react-table";
+import { DataTable } from "@/components/table/data-table";
+import { type InferQueryApiType, query } from "@/query";
 
 type Token = InferQueryApiType<typeof query.token.useTokens>[number];
 

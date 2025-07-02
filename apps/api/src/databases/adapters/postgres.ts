@@ -1,5 +1,5 @@
 import type { ColumnDataType, TableSchema } from "@local-sql/db-types";
-import { Pool, escapeIdentifier } from "pg";
+import { escapeIdentifier, Pool } from "pg";
 import { DatabaseConnection } from "../database-connection";
 
 export class PostgresDatabaseConnection extends DatabaseConnection {

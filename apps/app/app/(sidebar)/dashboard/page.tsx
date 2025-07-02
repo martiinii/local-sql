@@ -1,10 +1,10 @@
 "use client";
 
+import { RedirectType, redirect } from "next/navigation";
 import { DataGridTable } from "@/components/data-grid-table";
 import { useCurrentConnection } from "@/hooks/use-current-connection";
 import { useTableData } from "@/query/table";
 import { useAppStore } from "@/store/app.store";
-import { RedirectType, redirect } from "next/navigation";
 
 export default function Home() {
   const isInitialized = useAppStore((state) => state.isConnected);

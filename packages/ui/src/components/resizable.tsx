@@ -1,10 +1,9 @@
 "use client";
 
+import { cn } from "@local-sql/ui/utils";
 import { GripVerticalIcon } from "lucide-react";
 import type * as React from "react";
 import * as ResizablePrimitive from "react-resizable-panels";
-
-import { cn } from "@local-sql/ui/utils";
 
 function ResizablePanelGroup({
   className,

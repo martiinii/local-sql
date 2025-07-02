@@ -1,9 +1,9 @@
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useCreateMutation } from "@/lib/create-mutation";
 import { unwrapEdenQuery } from "@/lib/eden-query";
 import { useAppStore } from "@/store/app.store";
 import { useServersStore } from "@/store/servers.store";
-import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getQueryClient } from "./get-query-client";
 
 const SERVER_KEY = "server";

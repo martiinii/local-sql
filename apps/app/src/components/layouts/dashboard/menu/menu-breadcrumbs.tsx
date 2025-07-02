@@ -1,7 +1,5 @@
 "use client";
 
-import { useAppStore } from "@/store/app.store";
-import { useServersStore } from "@/store/servers.store";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,6 +8,8 @@ import {
 } from "@local-sql/ui/components/breadcrumb";
 import { Icons } from "@local-sql/ui/components/icons";
 import { useMemo } from "react";
+import { useAppStore } from "@/store/app.store";
+import { useServersStore } from "@/store/servers.store";
 
 export const MenuBreadcrumbs = () => {
   const appView = useAppStore((state) => state.view);

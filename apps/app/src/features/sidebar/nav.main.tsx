@@ -1,7 +1,7 @@
 "use client";
 
-import { useServersStore } from "@/store/servers.store";
 import { SidebarContent } from "@local-sql/ui/components/sidebar";
+import { useServersStore } from "@/store/servers.store";
 import { ServerSidebarGroup } from "./main/server-sidebar-group";
 
 export const NavMain = () => {

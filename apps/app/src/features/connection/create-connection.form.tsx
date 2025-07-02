@@ -1,5 +1,4 @@
 "use client";
-import { query } from "@/query";
 import {
   type FormProps,
   handleFormSubmit,
@@ -9,6 +8,7 @@ import { Input } from "@local-sql/ui/components/input";
 import { ShadowBox } from "@local-sql/ui/components/shadow-box";
 import { SubmitButton } from "@local-sql/ui/components/submit-button";
 import { type } from "arktype";
+import { query } from "@/query";
 
 const CreateConnectionSchema = type({
   "+": "delete",

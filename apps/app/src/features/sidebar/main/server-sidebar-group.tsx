@@ -1,11 +1,5 @@
 "use client";
 
-import { CreateConnectionDialog } from "@/features/connection/create-connection.dialog";
-import { ServerStatusIcon } from "@/features/connection/server-status-icon";
-import { UpdateServerDialog } from "@/features/server/update-server.dialog";
-import { ManageServerTokensDialog } from "@/features/token/manage-server-tokens.dialog";
-import { query } from "@/query";
-import type { Server } from "@/store/servers.store";
 import { LOCAL_SERVER_ID } from "@local-sql/db-types";
 import {
   DropdownMenu,
@@ -22,6 +16,12 @@ import {
   SidebarMenu,
 } from "@local-sql/ui/components/sidebar";
 import { type PropsWithChildren, useState } from "react";
+import { CreateConnectionDialog } from "@/features/connection/create-connection.dialog";
+import { ServerStatusIcon } from "@/features/connection/server-status-icon";
+import { UpdateServerDialog } from "@/features/server/update-server.dialog";
+import { ManageServerTokensDialog } from "@/features/token/manage-server-tokens.dialog";
+import { query } from "@/query";
+import type { Server } from "@/store/servers.store";
 import { DatabaseMenuItem } from "./database-menu-item";
 
 type ServerSidebarGroupProps = {

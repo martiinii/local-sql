@@ -1,9 +1,8 @@
 "use client";
 
+import { cn } from "@local-sql/ui/utils";
 import { HoverCard as HoverCardPrimitive } from "radix-ui";
 import type * as React from "react";
-
-import { cn } from "@local-sql/ui/utils";
 
 function HoverCard({
   ...props

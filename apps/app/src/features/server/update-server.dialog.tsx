@@ -1,7 +1,5 @@
 "use client";
 
-import { FormSpinner } from "@/components/form-spinner";
-import { query } from "@/query";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +8,8 @@ import {
   DialogTitle,
 } from "@local-sql/ui/components/dialog";
 import type { OnChangeFn } from "@tanstack/react-table";
+import { FormSpinner } from "@/components/form-spinner";
+import { query } from "@/query";
 import { ServerForm, type ServerFormProps } from "./server.form";
 
 type UpdateServerDialogProps = {

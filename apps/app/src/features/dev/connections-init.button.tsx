@@ -1,8 +1,8 @@
 "use client";
 
-import { query } from "@/query";
 import { Icons } from "@local-sql/ui/components/icons";
 import { SubmitButton } from "@local-sql/ui/components/submit-button";
+import { query } from "@/query";
 
 export const ConnectionsInitButton = () => {
   const { mutate, isPending } = query.server.useInitialize();

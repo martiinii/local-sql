@@ -1,9 +1,5 @@
 "use client";
 
-import { ConnectionStatus } from "@/features/connection/connection-status";
-import { query } from "@/query";
-import { useAppStore } from "@/store/app.store";
-import type { Connection, Server } from "@/store/servers.store";
 import {
   Collapsible,
   CollapsibleContent,
@@ -21,6 +17,10 @@ import {
   SidebarMenuItem,
 } from "@local-sql/ui/components/sidebar";
 import type { PropsWithChildren } from "react";
+import { ConnectionStatus } from "@/features/connection/connection-status";
+import { query } from "@/query";
+import { useAppStore } from "@/store/app.store";
+import type { Connection, Server } from "@/store/servers.store";
 import { DatabaseTableSubItem } from "./database-table-subitem";
 
 type DatabaseMenuItemProps = {

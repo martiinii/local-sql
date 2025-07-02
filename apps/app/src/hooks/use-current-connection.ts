@@ -1,6 +1,6 @@
+import { useMemo } from "react";
 import { useAppStore } from "@/store/app.store";
 import { useServersStore } from "@/store/servers.store";
-import { useMemo } from "react";
 
 export const useCurrentConnection = () => {
   const appView = useAppStore((state) => state.view);

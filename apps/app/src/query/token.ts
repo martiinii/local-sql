@@ -1,8 +1,8 @@
+import type { ServerPermission } from "@local-sql/db-types";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useCreateMutation } from "@/lib/create-mutation";
 import { unwrapEdenQuery } from "@/lib/eden-query";
-import type { ServerPermission } from "@local-sql/db-types";
-import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getQueryClient } from "./get-query-client";
 
 const TOKEN_KEY = "token";

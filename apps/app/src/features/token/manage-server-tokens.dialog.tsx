@@ -1,8 +1,5 @@
 "use client";
 
-import { FormSpinner } from "@/components/form-spinner";
-import { query } from "@/query";
-import type { Server } from "@/store/servers.store";
 import type { ServerPermission } from "@local-sql/db-types";
 import {
   Alert,
@@ -26,6 +23,9 @@ import { Icons } from "@local-sql/ui/components/icons";
 import { SubmitButton } from "@local-sql/ui/components/submit-button";
 import { InlineCode } from "@local-sql/ui/components/typography";
 import type { OnChangeFn } from "@tanstack/react-table";
+import { FormSpinner } from "@/components/form-spinner";
+import { query } from "@/query";
+import type { Server } from "@/store/servers.store";
 import { TokenTable } from "./token-table";
 
 type ManageServerTokensDialogProps = {

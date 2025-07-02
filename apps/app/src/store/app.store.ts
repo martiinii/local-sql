@@ -1,7 +1,7 @@
 "use client";
 
-import { revalidateTable } from "@/query/table";
 import { create } from "zustand";
+import { revalidateTable } from "@/query/table";
 
 type AppView = {
   serverId: string;

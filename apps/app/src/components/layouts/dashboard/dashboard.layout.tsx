@@ -1,10 +1,10 @@
-import { AppSidebar } from "@/features/sidebar/app-sidebar";
 import {
   SidebarInset,
   SidebarProvider,
 } from "@local-sql/ui/components/sidebar";
 import { cookies } from "next/headers";
 import type { PropsWithChildren } from "react";
+import { AppSidebar } from "@/features/sidebar/app-sidebar";
 import { DashboardMenu } from "./menu/dashboard.menu";
 
 export const DashboardLayout = async ({ children }: PropsWithChildren) => {

@@ -1,6 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { unwrapEdenQuery } from "@/lib/eden-query";
-import { useQuery } from "@tanstack/react-query";
 import { getQueryClient } from "./get-query-client";
 
 const TABLE_KEY = "table";

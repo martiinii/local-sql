@@ -1,8 +1,5 @@
 "use client";
 
-import { InlineCodeCopy } from "@/components/inline-code-copy";
-import { query } from "@/query";
-import { useAppStore } from "@/store/app.store";
 import {
   Card,
   CardContent,
@@ -13,6 +10,9 @@ import { Icons } from "@local-sql/ui/components/icons";
 import { H1, LargeMutedText } from "@local-sql/ui/components/typography";
 import { RedirectType, redirect } from "next/navigation";
 import { useEffect } from "react";
+import { InlineCodeCopy } from "@/components/inline-code-copy";
+import { query } from "@/query";
+import { useAppStore } from "@/store/app.store";
 
 export default function Page() {
   const isAppInitialized = useAppStore((state) => state.isConnected);

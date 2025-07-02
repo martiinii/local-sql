@@ -1,6 +1,5 @@
 "use client";
 
-import { query } from "@/query";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +9,7 @@ import {
   DialogTrigger,
 } from "@local-sql/ui/components/dialog";
 import { type PropsWithChildren, useState } from "react";
+import { query } from "@/query";
 import { ServerForm } from "./server.form";
 
 export const CreateServerDialog = ({ children }: PropsWithChildren) => {

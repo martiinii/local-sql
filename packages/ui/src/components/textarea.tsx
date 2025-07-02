@@ -1,7 +1,6 @@
-import type * as React from "react";
-
 import { cn } from "@local-sql/ui/utils";
 import type { AnyFieldApi } from "@tanstack/react-form";
+import type * as React from "react";
 
 type TextareaProps = React.ComponentProps<"textarea"> & { field?: AnyFieldApi };
 function Textarea({
