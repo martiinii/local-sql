@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@local-sql/api/*": ["./src/*"]
     },
     "typeRoots": ["src/@types"]
   },

@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
-import favicon from "@/../public/favicon.svg" with { type: "file" };
 import { swagger } from "@elysiajs/swagger";
+import favicon from "@local-sql/api/../public/favicon.svg" with {
+  type: "file",
+};
 import { LOCAL_SERVER_ID } from "@local-sql/db-types";
 import chalk from "chalk";
 import { Elysia } from "elysia";
