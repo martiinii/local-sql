@@ -118,5 +118,5 @@ And a huge thank you to the creators of the many other open-source dependencies 
 - [Etienne](https://github.com/etienne-dldc) - for generously providing `local-sql` package name
 - [check-site-meta](https://github.com/alfonsusac/check-site-meta) - inspiration for CLI tool (and Next.js standalone output to npm package)
 - [better-auth](https://www.better-auth.com/) - for awesome CI release workflow
-- [drizzle-orm](https://orm.drizzle.team/) - `drizle-studio` was my source of inspiration for `local-sql`
+- [drizzle-orm](https://orm.drizzle.team/) - `drizzle-studio` was my source of inspiration for `local-sql`
 
