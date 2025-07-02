@@ -1,20 +1,15 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env"],
   "ui": "stream",
   "tasks": {
     "topo": {
       "dependsOn": ["^topo"]
     },
     "build": {
-      "env": [],
-      "inputs": ["$TURBO_DEFAULT$", ".env"],
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts", "build/**"]
     },
     "build:docker": {
-      "env": [],
-      "inputs": ["$TURBO_DEFAULT$", ".env"],
       "dependsOn": ["^build:docker"],
       "outputs": ["build-docker/**"]
     },
@@ -25,20 +20,16 @@
       "cache": false
     },
     "dev": {
-      "inputs": ["$TURBO_DEFAULT$", ".env"],
       "persistent": true,
       "cache": false
     },
     "lint": {
+      "dependsOn": ["^topo"],
       "cache": false
     },
     "clean": {
       "dependsOn": ["^topo"],
       "cache": false
-    },
-    "typecheck": {
-      "dependsOn": ["^topo"],
-      "outputs": []
     }
   }
 }
