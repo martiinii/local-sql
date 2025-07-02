@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@local-sql/ui/*": ["../../packages/ui/src/*"]
+      "@local-sql/ui/*": ["../../packages/ui/src/*"],
+      "@local-sql/api/*": ["../api/src/*"]
     }
   },
   "include": [
