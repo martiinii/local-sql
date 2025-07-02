@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: determine_tag
     env:
-      TURBO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }} 
     strategy:
       fail-fast: true
