@@ -10,7 +10,7 @@ await rm("./build-docker", {
 });
 
 // Build the API
-await Bun.$`FORCE_COLOR=1 bun build ./src/index.ts --compile --external "@libsql/*" --external libsql --minify-whitespace --minify-syntax --target bun --outfile ./build-docker/server --define 'process.env.IS_BUNDLED=true'`;
+await Bun.$`FORCE_COLOR=1 bun build ./src/index.ts --compile --external "@libsql/*" --external libsql --minify-whitespace --minify-syntax --target bun --outfile ./build-docker/server`;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

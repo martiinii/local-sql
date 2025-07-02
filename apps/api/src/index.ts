@@ -1,4 +1,6 @@
 import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { swagger } from "@elysiajs/swagger";
 import favicon from "@local-sql/api/../public/favicon.svg" with {
   type: "file",
@@ -9,6 +11,7 @@ import { Elysia } from "elysia";
 import { adapter } from "./adapter";
 import { LOCAL_SERVER_PORT } from "./constants";
 import { migrateDatabase } from "./db/migrate-database";
+import { IS_BUNDLED } from "./lib/is-bundled";
 import { timeout } from "./lib/timeout-util";
 import { prettyLog } from "./plugins/pretty-log.plugin";
 import { setupPlugin } from "./plugins/setup.plugin";
@@ -16,13 +19,18 @@ import { initRouter } from "./routers/init.router";
 import { serverRouter } from "./routers/server.router";
 import { tokenRouter } from "./routers/token.router";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export const app = new Elysia({
   adapter: adapter,
 })
   .use(setupPlugin)
   // Elysia built-in file and @elysiajs/static don't work with Node.js correctly
   .get("/favicon.svg", async ({ set }) => {
-    const file = await readFile(favicon);
+    const file = await readFile(
+      IS_BUNDLED ? path.join(__dirname, favicon) : favicon,
+    );
     set.headers["content-type"] = "image/svg+xml";
 
     return file;
