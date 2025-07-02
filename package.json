@@ -19,7 +19,7 @@
     "build:api": "turbo build --filter=@local-sql/api",
     "build:cli": "turbo build --filter=@local-sql/cli",
     "build:api:docker": "turbo build:docker --filter=@local-sql/api",
-    "clean": "git clean -xdf .turbo",
+    "clean": "git clean -xdf .turbo/cache .turbo/cookies",
     "clean:workspaces": "turbo clean",
     "publish:ci": "bun"
   },
