@@ -26,10 +26,17 @@ export function NavSecondary({
               tooltip={item.title}
               aria-disabled={item.disabled}
             >
-              <Link href={item.url} prefetch>
-                <item.icon />
-                <span>{item.title}</span>
-              </Link>
+              {item.external ? (
+                <a href={item.url} target="_blank" rel="noopener">
+                  <item.icon />
+                  <span>{item.title}</span>
+                </a>
+              ) : (
+                <Link href={item.url} prefetch>
+                  <item.icon />
+                  <span>{item.title}</span>
+                </Link>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

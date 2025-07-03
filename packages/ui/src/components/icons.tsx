@@ -1,4 +1,5 @@
 import {
+  Bug,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -56,6 +57,7 @@ export const Icons = {
   Eye,
   Key: KeyRound,
   Sliders: Settings2,
+  Bug,
 };
 
 export type IconName = keyof typeof Icons;
