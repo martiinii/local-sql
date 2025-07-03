@@ -60,7 +60,7 @@ jobs:
       - name: Setup Bun.js
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.2.17"
+          bun-version: "1.2.18"
 
       - name: Generate changelog
         run: bunx changelogithub
@@ -84,7 +84,7 @@ jobs:
       - name: Setup Bun.js
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.2.17"
+          bun-version: "1.2.18"
 
       - name: Install dependencies
         run: bun i
@@ -115,7 +115,7 @@ jobs:
       - name: Setup Bun.js
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.2.17"
+          bun-version: "1.2.18"
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -212,7 +212,7 @@ jobs:
       - name: Setup Bun.js
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.2.17"
+          bun-version: "1.2.18"
 
       - name: Setup Vercel CLI
         run: bun add --global vercel@latest
