@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "format": "biome format --write .",
     "lint": "biome lint",
-    "clean": "git clean -xdf .next .turbo build"
+    "clean": "git clean -xdf .next .turbo build",
+    "update": "bun update"
   },
   "dependencies": {
     "@local-sql/db-types": "workspace:*",

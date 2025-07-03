@@ -31,6 +31,10 @@
     "clean": {
       "dependsOn": ["^topo"],
       "cache": false
+    },
+    "update": {
+      "dependsOn": ["^topo"],
+      "cache": false
     }
   }
 }

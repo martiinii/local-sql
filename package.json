@@ -22,7 +22,8 @@
     "format": "biome format --write .",
     "lint": "turbo lint && bun lint:repo",
     "lint:repo": "bunx sherif@latest",
-    "lint:repo:fix": "bunx sherif@latest --fix"
+    "lint:repo:fix": "bunx sherif@latest --fix",
+    "update:workspaces": "turbo update --concurrency 1 && bun update"
   },
   "devDependencies": {
     "@biomejs/biome": "2.0.6",

@@ -11,7 +11,8 @@
     "start": "bun src/index.ts",
     "format": "biome format --write .",
     "lint": "biome lint",
-    "clean": "git clean -xdf .turbo build build-docker"
+    "clean": "git clean -xdf .turbo build build-docker",
+    "update": "bun update"
   },
   "dependencies": {
     "@elysiajs/bearer": "^1.3.0",

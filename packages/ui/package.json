@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "format": "biome format --write .",
-    "lint": "biome lint"
+    "lint": "biome lint",
+    "update": "bun update"
   },
   "dependencies": {
     "@tanstack/react-form": "^1.12.1",
