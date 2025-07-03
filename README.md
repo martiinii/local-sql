@@ -6,6 +6,7 @@
 [![NPM Version](https://img.shields.io/npm/v/local-sql)](https://www.npmjs.com/package/local-sql)
 [![GitHub License](https://img.shields.io/github/license/martiinii/local-sql)](https://github.com/martiinii/local-sql/blob/main/LICENSE.md)
 </div>
+
 ---
 
 Local SQL is a web based, local-first modern database browser.
