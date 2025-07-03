@@ -26,8 +26,10 @@ import {
   Unplug,
   Wrench,
 } from "lucide-react";
+import { FiGithub } from "react-icons/fi";
 
 export const Icons = {
+  Github: FiGithub,
   Loader: Loader2,
   Sun,
   MoonStar,
