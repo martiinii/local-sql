@@ -1,8 +1,10 @@
 "use client";
 
+import { Button } from "@local-sql/ui/components/button";
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@local-sql/ui/components/card";
@@ -84,6 +86,17 @@ export default function Page() {
               to start the server
             </p>
           </CardContent>
+          <CardFooter>
+            <Button variant={"outline"} asChild>
+              <a
+                href="https://github.com/martiinii/local-sql#readme"
+                target="_blank"
+                rel="noopener"
+              >
+                <Icons.Github /> GitHub repository
+              </a>
+            </Button>
+          </CardFooter>
         </Card>
       </div>
     </main>
