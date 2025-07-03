@@ -8,20 +8,21 @@
   ],
   "scripts": {
     "dev": "turbo dev --parallel",
-    "format": "biome format --write .",
-    "lint": "turbo lint && bun lint:repo",
-    "lint:repo": "bunx sherif@latest",
-    "lint:repo:fix": "bunx sherif@latest --fix",
-    "bump": "bumpp",
+    "dev:app": "turbo dev --filter=@local-sql/app",
+    "dev:api": "turbo dev --filter=@local-sql/api",
     "build": "turbo build",
     "build:docker": "turbo build:docker",
     "build:app": "turbo build --filter=@local-sql/app",
     "build:api": "turbo build --filter=@local-sql/api",
     "build:cli": "turbo build --filter=@local-sql/cli",
     "build:api:docker": "turbo build:docker --filter=@local-sql/api",
+    "bump": "bumpp",
     "clean": "git clean -xdf .turbo/cache .turbo/cookies",
     "clean:workspaces": "turbo clean",
-    "publish:ci": "bun"
+    "format": "biome format --write .",
+    "lint": "turbo lint && bun lint:repo",
+    "lint:repo": "bunx sherif@latest",
+    "lint:repo:fix": "bunx sherif@latest --fix"
   },
   "devDependencies": {
     "@biomejs/biome": "2.0.6",
