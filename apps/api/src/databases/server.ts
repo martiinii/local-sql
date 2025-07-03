@@ -78,6 +78,10 @@ export class Server {
 
     try {
       this._permission = "none";
+      if (this.isLocalInstance) {
+        await this._connections.disconnectAll();
+      }
+
       this._connections = new Connections();
 
       if (this.isLocalInstance) {
