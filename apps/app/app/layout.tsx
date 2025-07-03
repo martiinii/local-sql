@@ -24,6 +24,12 @@ const fontMonto = Geist_Mono({
 });
 export const metadata: Metadata = {
   title: "Local SQL",
+  description:
+    "Local SQL is a privacy-focused, local-first database browser for managing and exploring your databases securely from your own machine.",
+  openGraph: {
+    url: "https://localsql.dev",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
