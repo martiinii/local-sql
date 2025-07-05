@@ -49,6 +49,7 @@ const DatabasePaginationPreviousButton = () => {
           size={"icon"}
         >
           <Icons.ChevronLeft />
+          <span className="sr-only">Previous page</span>
         </Button>
       </TooltipTrigger>
       <TooltipContent side="bottom">Previous page</TooltipContent>
@@ -69,6 +70,7 @@ const DatabasePaginationNextButton = () => {
           size={"icon"}
         >
           <Icons.ChevronRight />
+          <span className="sr-only">Next page</span>
         </Button>
       </TooltipTrigger>
       <TooltipContent side="bottom">Next page</TooltipContent>
