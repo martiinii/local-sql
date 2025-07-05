@@ -208,6 +208,8 @@ jobs:
   vercel_deploy:
     runs-on: ubuntu-latest
     needs: [determine_tag, publish]
+    outputs:
+      deployment_url: ${{ steps.deploy.outputs.deployment_url}}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -221,7 +223,45 @@ jobs:
         run: bun add --global vercel@latest
 
       - name: Deploy app to Vercel
-        run: vercel deploy ${{ needs.determine_tag.outputs.npm_tag == 'latest' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        id: deploy
+        run: |
+          DEPLOYMENT_URL=$(vercel deploy ${{ needs.determine_tag.outputs.npm_tag == 'latest' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "deployment_url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "Deployment URL: $DEPLOYMENT_URL"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: [determine_tag, changelog, build, publish, docker_publish, vercel_deploy]
+    if: always()
+    steps:
+      - name: Create release summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          # 🚀 Release summary
+          
+          ## 📦 Release Information
+          
+          - **Version**: `${{ needs.determine_tag.outputs.version }}`
+          - **Tag**: `${{ needs.determine_tag.outputs.npm_tag }}`
+          - **Environment**: ${{ needs.determine_tag.outputs.npm_tag == 'latest' && '🟢 Production' || '🟡 Preview' }}
+          - **Commit**: `${{ github.sha }}`
+          - **Triggered by**: `${{ github.actor }}`
+          
+          ## 📋 Job Status
+
+          | Job | Status |
+          |-----|:------:|
+          | Changelog | ${{ needs.changelog.result == 'success' && '✅' || '❌' }} |
+          | Build | ${{ needs.build.result == 'success' && '✅' || '❌' }} |
+          | NPM Publish | ${{ needs.publish.result == 'success' && '✅' || '❌' }} |
+          | Docker Publish | ${{ needs.docker_publish.result == 'success' && '✅' || '❌' }} |
+          | Vercel Deploy | ${{ needs.vercel_deploy.result == 'success' && '✅' || '❌' }} |
+          
+          ## 🔗 Links
+          - **🌐 Live Application**: ${{ needs.vercel_deploy.result == 'failure' && '[Deploy Failed](#)' || (needs.determine_tag.outputs.npm_tag == 'latest' && '[https://localsql.dev](https://localsql.dev)' || format('[{0}]({0})', needs.vercel_deploy.outputs.deployment_url)) }}
+          - **🐳 Docker Image**: [ghcr.io/${{ github.repository }}:${{ needs.determine_tag.outputs.npm_tag }}](https://ghcr.io/${{ github.repository }})
+          - **📝 Release Notes**: [View Changelog](https://github.com/${{ github.repository }}/releases/tag/v${{ needs.determine_tag.outputs.version }})
+          EOF
