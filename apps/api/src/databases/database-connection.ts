@@ -1,8 +1,4 @@
-import type {
-  Pagination,
-  TableSchema,
-  TableWithSchema,
-} from "@local-sql/db-types";
+import type { TableSchema, TableWithSchema } from "@local-sql/db-types";
 
 export abstract class DatabaseConnection {
   name: string;
@@ -119,15 +115,12 @@ export abstract class DatabaseConnection {
     }
   }
 
-  async queryData(
-    table: string,
-    pagination: Pagination,
-  ): Promise<Record<string, unknown>[] | null> {
+  async queryData(table: string): Promise<Record<string, unknown>[] | null> {
     if (!this.isConnected) return null;
     if (!this._tableNames?.has(table)) return null;
 
     try {
-      const data = await this._queryData(table, pagination);
+      const data = await this._queryData(table);
       return data;
     } catch {
       return [];
@@ -142,6 +135,5 @@ export abstract class DatabaseConnection {
 
   protected abstract _queryData(
     table: string,
-    pagination: Pagination,
   ): Promise<Record<string, unknown>[]>;
 }

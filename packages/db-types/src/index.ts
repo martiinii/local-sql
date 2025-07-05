@@ -12,11 +12,6 @@ export type TableWithSchema = {
   schema: TableSchema;
 };
 
-export type Pagination = {
-  limit: number;
-  offset: number;
-};
-
 export type DBValidConnectionStatus = "connected" | "disconnected";
 export type DBInvalidConnectionStatus = "error";
 

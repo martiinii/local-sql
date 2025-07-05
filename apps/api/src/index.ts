@@ -35,19 +35,11 @@ export const app = new Elysia({
 
     return file;
   })
-  // Redirect doesn't work correctly with Node.js
-  .get(
-    "/",
-    ({ set, status }) => {
-      set.headers.location = "/swagger";
-      return status(307);
-    },
-    {
-      detail: {
-        hide: true,
-      },
-    },
-  )
+  // Redirect doesn't work correcly with Node.js
+  .get("/", ({ set, status }) => {
+    set.headers.location = "/swagger";
+    return status(307);
+  })
   .use(
     swagger({
       path: "/swagger",

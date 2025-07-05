@@ -1,8 +1,4 @@
-import type {
-  ColumnDataType,
-  Pagination,
-  TableSchema,
-} from "@local-sql/db-types";
+import type { ColumnDataType, TableSchema } from "@local-sql/db-types";
 import { escapeIdentifier, Pool } from "pg";
 import { DatabaseConnection } from "../database-connection";
 
@@ -66,15 +62,11 @@ export class PostgresDatabaseConnection extends DatabaseConnection {
 
   protected async _queryData(
     table: string,
-    pagination: Pagination,
   ): Promise<Record<string, unknown>[]> {
     const escapedTableName = escapeIdentifier(table);
-    const query = `SELECT * FROM ${escapedTableName} LIMIT $1 OFFSET $2`;
+    const query = `SELECT * FROM ${escapedTableName}`;
 
-    const res = await this._db.query(query, [
-      pagination.limit,
-      pagination.offset,
-    ]);
+    const res = await this._db.query(query);
     return res.rows;
   }
 }

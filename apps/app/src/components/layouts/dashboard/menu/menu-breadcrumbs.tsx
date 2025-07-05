@@ -32,20 +32,20 @@ export const MenuBreadcrumbs = () => {
 
   return (
     <Breadcrumb>
-      <BreadcrumbList className="flex-nowrap">
-        <BreadcrumbItem className="hidden md:inline-flex">
+      <BreadcrumbList>
+        <BreadcrumbItem>
           <Icons.Server />
           {currentConnectionName?.serverName}
         </BreadcrumbItem>
 
-        <BreadcrumbSeparator className="hidden md:block" />
+        <BreadcrumbSeparator />
 
-        <BreadcrumbItem className="hidden sm:inline-flex">
+        <BreadcrumbItem>
           <Icons.Database />
           {currentConnectionName?.connectionName}
         </BreadcrumbItem>
 
-        <BreadcrumbSeparator className="hidden sm:block" />
+        <BreadcrumbSeparator />
 
         <BreadcrumbItem>
           <Icons.Table className="rotate-180" />
