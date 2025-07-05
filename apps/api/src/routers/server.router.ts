@@ -75,7 +75,6 @@ export const serverRouter = new Elysia({
       });
       if (!response) return status(404, "Server not found");
 
-      console.log(response);
       return response;
     },
     {
@@ -484,7 +483,7 @@ export const serverRouter = new Elysia({
   )
   .get(
     `/${LOCAL_SERVER_ID}/database/:databaseId/data/:table`,
-    async ({ params, store: { servers }, status }) => {
+    async ({ params, query, store: { servers }, status }) => {
       const server = servers.get(LOCAL_SERVER_ID);
       if (!server) return status(404, "Server not found");
 
@@ -500,7 +499,7 @@ export const serverRouter = new Elysia({
       const db = server.connections.get(params.databaseId);
       if (!db) return status(404, "Database not found");
 
-      const res = await db.queryData(params.table);
+      const res = await db.queryData(params.table, query);
       if (!res)
         return status(503, "Database not connected or table not accessible");
 
@@ -513,11 +512,15 @@ export const serverRouter = new Elysia({
         description: "Queries database table data",
         hide: true,
       },
+      query: t.Object({
+        limit: t.Number({ default: 50, minimum: 0, maximum: 500 }),
+        offset: t.Number({ default: 0, minimum: 0 }),
+      }),
     },
   )
   .get(
     "/:serverId/database/:databaseId/data/:table",
-    async ({ params, store: { servers }, status }) => {
+    async ({ params, query, store: { servers }, status }) => {
       const server = servers.get(params.serverId);
       if (!server) return status(404, "Server not found");
 
@@ -535,7 +538,7 @@ export const serverRouter = new Elysia({
         const response = await server.gatewayApi.server.local
           .database({ databaseId: params.databaseId })
           .data({ table: params.table })
-          .get();
+          .get({ query });
         if (response.error) {
           return status(response.error.status, response.error.value);
         }
@@ -551,5 +554,9 @@ export const serverRouter = new Elysia({
         summary: "Get table data",
         description: "Queries database table data",
       },
+      query: t.Object({
+        limit: t.Number({ default: 50, minimum: 0, maximum: 500 }),
+        offset: t.Number({ default: 0, minimum: 0 }),
+      }),
     },
   );
