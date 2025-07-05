@@ -14,6 +14,7 @@ import {
   MoonStar,
   Plus,
   Power,
+  RefreshCw,
   Send,
   Server,
   Settings,
@@ -58,6 +59,7 @@ export const Icons = {
   Key: KeyRound,
   Sliders: Settings2,
   Bug,
+  RefreshCw,
 };
 
 export type IconName = keyof typeof Icons;

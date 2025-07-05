@@ -21,6 +21,7 @@
     "@local-sql/ui": "workspace:*",
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-table": "^8.21.3",
+    "@uidotdev/usehooks": "^2.4.1",
     "arktype": "^2.1.20",
     "commander": "^14.0.0",
     "next": "^15.3.4",
