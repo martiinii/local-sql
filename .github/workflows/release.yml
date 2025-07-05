@@ -264,6 +264,6 @@ jobs:
           
           ## 🔗 Links
           - **🌐 Live Application**: ${{ needs.vercel_deploy.result == 'failure' && '[Deploy Failed](#)' || (needs.determine_tag.outputs.npm_tag == 'latest' && '[https://localsql.dev](https://localsql.dev)' || format('[{0}]({0})', needs.vercel_deploy.outputs.deployment_url)) }}
-          - **🐳 Docker Image**: [ghcr.io/${{ github.repository }}:${{ needs.determine_tag.outputs.npm_tag }}](https://ghcr.io/${{ github.repository }})
+          - **🐳 Docker Image**: [ghcr.io/${{ github.repository }}:${{ needs.determine_tag.outputs.version }}](https://ghcr.io/${{ github.repository }})
           - **📝 Release Notes**: [View Changelog](https://github.com/${{ github.repository }}/releases/tag/v${{ needs.determine_tag.outputs.version }})
           EOF
