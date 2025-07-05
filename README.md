@@ -27,7 +27,7 @@ Visit [localsql.dev](https://localsql.dev), add connection and start browsing yo
 
 - [x] Implement data fetching and data viewer
 - [ ] Inserting and updating data
-- [ ] Implement pagination
+- [x] Implement pagination
 - [ ] Schema visualizer
 - [ ] Role based access control (per-table, improve permission: read-only, read & write, admin)
 - [ ] SQL query runner and natural-language support using AI
