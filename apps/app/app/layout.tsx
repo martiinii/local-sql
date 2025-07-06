@@ -23,17 +23,21 @@ const fontMonto = Geist_Mono({
   subsets: ["latin"],
 });
 
+const PRODUCTION_URL = "https://localsql.dev";
+
 export const metadata: Metadata = {
   title: "Local SQL",
   description:
     "Local SQL is a privacy-focused, local-first database browser for managing and exploring your databases securely from your own machine.",
   metadataBase: new URL(
-    process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "https://localsql.dev",
+    process.env.VERCEL_ENV === "production"
+      ? PRODUCTION_URL
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : PRODUCTION_URL,
   ),
   openGraph: {
-    url: "https://localsql.dev",
+    url: PRODUCTION_URL,
     type: "website",
   },
 };
