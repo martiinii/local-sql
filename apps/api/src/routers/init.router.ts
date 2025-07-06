@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { adapter } from "../adapter";
+import { adapter } from "../lib/adapter";
 import { setupPlugin } from "../plugins/setup.plugin";
 
 export const initRouter = new Elysia({

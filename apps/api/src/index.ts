@@ -8,9 +8,9 @@ import favicon from "@local-sql/api/../public/favicon.svg" with {
 import { LOCAL_SERVER_ID } from "@local-sql/db-types";
 import chalk from "chalk";
 import { Elysia } from "elysia";
-import { adapter } from "./adapter";
 import { LOCAL_SERVER_PORT } from "./constants";
 import { migrateDatabase } from "./db/migrate-database";
+import { adapter } from "./lib/adapter";
 import { IS_BUNDLED } from "./lib/is-bundled";
 import { timeout } from "./lib/timeout-util";
 import { prettyLog } from "./plugins/pretty-log.plugin";

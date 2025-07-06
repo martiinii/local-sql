@@ -1,6 +1,6 @@
 import { LOCAL_SERVER_ID } from "@local-sql/db-types";
 import { Elysia, t } from "elysia";
-import { adapter } from "../adapter";
+import { adapter } from "../lib/adapter";
 import { setupPlugin } from "../plugins/setup.plugin";
 
 export const serverRouter = new Elysia({
