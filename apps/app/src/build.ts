@@ -5,23 +5,23 @@ import { copyFiles, prettyPrintBunBuildArtifact } from "@local-sql/utils/cli";
 import chalk from "chalk";
 
 // Clean up previous build directories
-await rm("./.next", {
+await rm("../.next", {
   recursive: true,
   force: true,
 });
 
-await rm("./build", {
+await rm("../build", {
   recursive: true,
   force: true,
 });
 
 // Build the Next app
-await Bun.$`bun run build:next`;
+await Bun.$`bun run --cwd .. build:next`;
 
 // Build CLI
 const result = await Bun.build({
-  entrypoints: ["./src/cli.ts"],
-  outdir: "./build",
+  entrypoints: ["cli.ts"],
+  outdir: "../build/dist",
   target: "node",
   minify: {
     syntax: true,
@@ -41,7 +41,7 @@ const __dirname = path.dirname(__filename);
 type PackageJson = Record<"name" | "description" | "version", string> &
   Record<"dependencies", Record<string, string>>;
 const packageJson: PackageJson = await Bun.file(
-  path.join(__dirname, "./package.json"),
+  path.join(__dirname, "..", "package.json"),
 ).json();
 
 const extractDependenciesNames = ["next"];
@@ -62,42 +62,42 @@ const packageJsonBuild = {
   version: packageJson.version,
   type: "module",
   bin: {
-    "@local-sql/app": "./cli.js",
+    "@local-sql/app": "./dist/cli.js",
   },
   dependencies: extractedDependencies,
 };
 
 await Bun.write(
-  "./build/package.json",
+  "../build/package.json",
   JSON.stringify(packageJsonBuild, null, 2),
 );
 
 // Remove cache dir
-await rm("./.next/cache", {
+await rm("../.next/cache", {
   recursive: true,
   force: true,
 });
 
 await copyFiles({
   pattern: "README.md",
-  outdir: "./build",
-  baseDir: "./",
+  outdir: "../build",
+  baseDir: "../",
   msgName: "README",
 });
 
 // Copy static assets to standalone app https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files
 await copyFiles({
   pattern: "**/*",
-  outdir: "./.next/standalone/apps/app/.next/static",
-  baseDir: "./.next/static",
+  outdir: "../.next/standalone/apps/app/.next/static",
+  baseDir: "../.next/static",
   msgName: "static assets",
 });
 
 // Copy standalone app to build directory
 await copyFiles({
   pattern: "**/*",
-  outdir: "./build",
-  baseDir: "./.next/standalone/apps/app",
+  outdir: "../build/dist",
+  baseDir: "../.next/standalone/apps/app",
   msgName: "standalone build",
 });
 

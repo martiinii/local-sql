@@ -1,12 +1,12 @@
 {
   "name": "@local-sql/app",
-  "description": "Next.js App of Local SQL",
+  "description": "Local SQL Next.js app",
   "version": "1.1.2-beta.2",
   "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev -p 7597 --turbo",
-    "build": "bun ./build.ts",
+    "build": "bun --cwd src build.ts",
     "build:next": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",

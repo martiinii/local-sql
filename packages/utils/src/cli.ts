@@ -53,7 +53,7 @@ export const copyFiles = async ({
 
   for await (const filePath of glob.scan({ cwd: baseDir, dot: true })) {
     fileCount++;
-    const file = Bun.file(join(baseDir || "./", filePath));
+    const file = Bun.file(join(baseDir || ".", filePath));
 
     const outputPath = join(outdir, filePath);
 
@@ -74,6 +74,8 @@ export const prettyPrintBunBuildArtifact = (artifact: Bun.BuildArtifact) => {
   const fileName = path.basename(artifact.path);
 
   console.log(
-    chalk.green(`  - Bundled ${fileName} ${chalk.yellow(`(${size})`)}`),
+    chalk.green(
+      `  - Bundled ${chalk.magenta(fileName)} ${chalk.yellow(`(${size})`)}`,
+    ),
   );
 };

@@ -14,7 +14,8 @@
       "!**/.turbo",
       "!**/build",
       "!**/build-docker",
-      "!**/out"
+      "!**/out",
+      "!**/*.gen.ts"
     ]
   },
   "formatter": {

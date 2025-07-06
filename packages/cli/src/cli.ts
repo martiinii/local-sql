@@ -18,7 +18,7 @@ const __dirname = path.dirname(__filename);
 
 type PackageJson = Record<"name" | "description" | "version", string>;
 const packageJson: PackageJson = JSON.parse(
-  readFileSync(path.join(__dirname, "./package.json"), "utf8"),
+  readFileSync(path.join(__dirname, "..", "package.json"), "utf8"),
 );
 program
   .name(packageJson.name)
