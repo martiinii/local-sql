@@ -5,15 +5,15 @@ import { copyFiles, prettyPrintBunBuildArtifact } from "@local-sql/utils/cli";
 import chalk from "chalk";
 
 // Clean up previous build directory
-await rm("./build", {
+await rm("../build", {
   recursive: true,
   force: true,
 });
 
 // Build the API
 const result = await Bun.build({
-  entrypoints: ["./src/index.ts", "./src/cli.ts"],
-  outdir: "./build",
+  entrypoints: ["index.ts", "cli.ts"],
+  outdir: "../build/dist",
   target: "node",
   minify: {
     syntax: true,
@@ -36,7 +36,7 @@ const __dirname = path.dirname(__filename);
 type PackageJson = Record<"name" | "description" | "version", string> &
   Record<"dependencies", Record<string, string>>;
 const packageJson: PackageJson = await Bun.file(
-  path.join(__dirname, "./package.json"),
+  path.join(__dirname, "..", "package.json"),
 ).json();
 
 const extractDependenciesNames = ["@libsql/client"];
@@ -57,19 +57,19 @@ const packageJsonBuild = {
   version: packageJson.version,
   type: "module",
   bin: {
-    "@local-sql/api": "./cli.js",
+    "@local-sql/api": "./dist/cli.js",
   },
   dependencies: extractedDependencies,
 };
 
 await Bun.write(
-  "./build/package.json",
+  "../build/package.json",
   JSON.stringify(packageJsonBuild, null, 2),
 );
 await copyFiles({
   pattern: "README.md",
-  outdir: "./build",
-  baseDir: "./",
+  outdir: "../build",
+  baseDir: "../",
   msgName: "README",
 });
 
