@@ -42,7 +42,7 @@ const main = async () => {
       env: {
         ...process.env,
         FORCE_COLOR: "1",
-        PORT: options.port?.toString() || "7579",
+        PORT: options.port?.toString() || "7597",
         HOSTNAME: "localhost", // TODO allow binding other address via options
       },
     },
