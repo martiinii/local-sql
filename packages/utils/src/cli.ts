@@ -74,6 +74,8 @@ export const prettyPrintBunBuildArtifact = (artifact: Bun.BuildArtifact) => {
   const fileName = path.basename(artifact.path);
 
   console.log(
-    chalk.green(`  - Bundled ${fileName} ${chalk.yellow(`(${size})`)}`),
+    chalk.green(
+      `  - Bundled ${chalk.magenta(fileName)} ${chalk.yellow(`(${size})`)}`,
+    ),
   );
 };

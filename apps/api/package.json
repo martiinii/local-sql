@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "bun run --watch src/index.ts",
+    "generate:migrations": "bun --cwd src generate-migrations-imports-file.ts",
     "build": "bun --cwd src build.ts",
     "build:docker": "bun --cwd src build.docker.ts",
     "start": "bun src/index.ts",
