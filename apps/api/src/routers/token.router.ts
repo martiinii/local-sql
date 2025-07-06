@@ -1,11 +1,11 @@
 import { LOCAL_SERVER_ID } from "@local-sql/db-types";
 import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
-import { adapter } from "../adapter";
 import { db } from "../db";
 import { createToken } from "../db/helpers/create-token";
 import { obfuscateToken } from "../db/helpers/obfuscate-token";
 import { accessToken } from "../db/schema/access-token";
+import { adapter } from "../lib/adapter";
 import { setupPlugin } from "../plugins/setup.plugin";
 
 export const tokenRouter = new Elysia({

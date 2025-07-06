@@ -1,25 +1,42 @@
 import { rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { copyFiles, prettyPrintBunBuildArtifact } from "@local-sql/utils/cli";
 import chalk from "chalk";
 
 // Clean up previous build directory
-await rm("./build-docker", {
+await rm("../build", {
   recursive: true,
   force: true,
 });
 
 // Build the API
-await Bun.$`FORCE_COLOR=1 bun build ./src/index.ts --compile --external "@libsql/*" --external libsql --minify-whitespace --minify-syntax --target bun --outfile ./build-docker/server`;
+const result = await Bun.build({
+  entrypoints: ["index.ts", "cli.ts"],
+  outdir: "../build/dist",
+  target: "node",
+  minify: {
+    syntax: true,
+    whitespace: true,
+  },
+  banner: "#!/usr/bin/env node",
+  define: {
+    "process.env.IS_BUNDLED": "true",
+  },
+});
+
+for (const output of result.outputs) {
+  prettyPrintBunBuildArtifact(output);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Create package.json that contains @libsql/client as dependency. It will be used to create node_modules and copy them alongside compiled server https://github.com/oven-sh/bun/issues/18909
+// Create package.json and README for the build
 type PackageJson = Record<"name" | "description" | "version", string> &
   Record<"dependencies", Record<string, string>>;
 const packageJson: PackageJson = await Bun.file(
-  path.join(__dirname, "./package.json"),
+  path.join(__dirname, "..", "package.json"),
 ).json();
 
 const extractDependenciesNames = ["@libsql/client"];
@@ -40,13 +57,20 @@ const packageJsonBuild = {
   version: packageJson.version,
   type: "module",
   bin: {
-    "@local-sql/api": "./cli.js",
+    "@local-sql/api": "./dist/cli.js",
   },
   dependencies: extractedDependencies,
 };
 
 await Bun.write(
-  "./build-docker/package.json",
+  "../build/package.json",
   JSON.stringify(packageJsonBuild, null, 2),
 );
-console.log(chalk.green("\nAPI Docker Build completed successfully"));
+await copyFiles({
+  pattern: "README.md",
+  outdir: "../build",
+  baseDir: "../",
+  msgName: "README",
+});
+
+console.log(chalk.green("\nAPI Build completed successfully"));

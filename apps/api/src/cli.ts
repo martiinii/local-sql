@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 
 type PackageJson = Record<"name" | "description" | "version", string>;
 const packageJson: PackageJson = JSON.parse(
-  readFileSync(path.join(__dirname, "./package.json"), "utf8"),
+  readFileSync(path.join(__dirname, "..", "package.json"), "utf8"),
 );
 program
   .name(packageJson.name)
@@ -39,7 +39,7 @@ const main = async () => {
   logger(`Detected ${chalk.blue.bold(RUNTIME)} runtime`);
 
   const elysiaProcess = spawn(
-    ...constructSpawnArgs(RUNTIME, false, [path.join(__dirname, "./index.js")]),
+    ...constructSpawnArgs(RUNTIME, false, [path.join(__dirname, "index.js")]),
     {
       stdio: ["ignore", "pipe", "pipe"],
       env: {

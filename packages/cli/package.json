@@ -1,11 +1,11 @@
 {
   "name": "@local-sql/cli",
   "description": "Manage PostgreSQL databases locally",
-  "version": "1.1.1",
+  "version": "1.1.2-beta.3",
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "bun run ./build.ts",
+    "build": "bun run --cwd src build.ts",
     "lint": "biome lint --write",
     "format": "biome format --write",
     "clean": "git clean -xdf .turbo build",

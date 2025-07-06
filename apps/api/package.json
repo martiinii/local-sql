@@ -1,13 +1,14 @@
 {
   "name": "@local-sql/api",
-  "description": "API of Local SQL",
-  "version": "1.1.1",
+  "description": "Local SQL server API",
+  "version": "1.1.2-beta.3",
   "type": "module",
   "private": true,
   "scripts": {
     "dev": "bun run --watch src/index.ts",
-    "build": "bun ./build.ts",
-    "build:docker": "bun ./build.docker.ts",
+    "generate:migrations": "bun --cwd src generate-migrations-imports-file.ts",
+    "build": "bun --cwd src build.ts",
+    "build:docker": "bun --cwd src build.docker.ts",
     "start": "bun src/index.ts",
     "format": "biome format --write .",
     "lint": "biome lint",
