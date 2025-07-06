@@ -39,6 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     url: PRODUCTION_URL,
     type: "website",
+    siteName: "Local SQL",
   },
 };
 
