@@ -1,7 +1,7 @@
 {
   "name": "@local-sql/cli",
   "description": "Manage PostgreSQL databases locally",
-  "version": "1.1.2",
+  "version": "1.1.3-beta.1",
   "type": "module",
   "private": true,
   "scripts": {
