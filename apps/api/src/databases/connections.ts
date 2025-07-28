@@ -10,14 +10,6 @@ export class Connections {
   private _connectionIds: Set<string> = new Set();
   private _connections: Map<string, DatabaseConnection> = new Map();
 
-  private _serverUrl: string | null;
-  private _serverToken: string | null;
-
-  constructor(serverUrl?: string, serverToken?: string) {
-    this._serverUrl = serverUrl || null;
-    this._serverToken = serverToken || null;
-  }
-
   /**
    * Internal function to add database connection and query tables
    * @param id Database id
