@@ -26,12 +26,12 @@
     "update:workspaces": "turbo update --concurrency 1 && bun update"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.0.6",
+    "@biomejs/biome": "^2.1.2",
     "@local-sql/typescript-config": "workspace:*",
     "bumpp": "^10.2.0",
     "tinyglobby": "^0.2.14",
-    "turbo": "^2.5.4",
+    "turbo": "^2.5.5",
     "typescript": "^5.8.3"
   },
-  "packageManager": "bun@1.2.18"
+  "packageManager": "bun@1.2.19"
 }
