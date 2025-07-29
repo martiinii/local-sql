@@ -3,6 +3,7 @@ import "@local-sql/ui/globals.css";
 import { Toaster } from "@local-sql/ui/components/sonner";
 import { TooltipProvider } from "@local-sql/ui/components/tooltip";
 import { cn } from "@local-sql/ui/lib/utils";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
@@ -70,6 +71,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
             </ThemeProvider>
           </QueryClientProvider>
         </NuqsAdapter>
+        {process.env.VERCEL_ENV === "production" && <Analytics />}
       </body>
     </html>
   );
