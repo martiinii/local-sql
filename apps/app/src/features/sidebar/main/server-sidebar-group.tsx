@@ -1,6 +1,7 @@
 "use client";
 
 import { LOCAL_SERVER_ID } from "@local-sql/db-types";
+import { Button } from "@local-sql/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -94,6 +95,23 @@ export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
           </SidebarGroupAction>
         </DropdownMenuTrigger>
       </ServerSidebarDropdownMenu>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {server.connections.length === 0 && (
+            <Button
+              size={"sm"}
+              variant={"ghost"}
+              onClick={() => setIsNewConnOpen(true)}
+            >
+              Add first connection <Icons.Plus />
+            </Button>
+          )}
+          {server.connections.map((conn) => (
+            <DatabaseMenuItem key={conn.id} server={server} connection={conn} />
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+
       <CreateConnectionDialog
         serverId={server.id}
         isOpen={isNewConnOpen}
@@ -115,13 +133,6 @@ export const ServerSidebarGroup = ({ server }: ServerSidebarGroupProps) => {
         isOpen={isTokensOpen}
         setIsOpen={setIsTokensOpen}
       />
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {server.connections.map((conn) => (
-            <DatabaseMenuItem key={conn.id} server={server} connection={conn} />
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
     </SidebarGroup>
   );
 };
